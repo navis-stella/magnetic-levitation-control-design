@@ -25,7 +25,7 @@ $$
 ## 3.3 Full-State Feedback
 
 $$
-\Delta i = -K\,\mathbf{z} = -K_1x - K_2v - K_3q
+\Delta i = -K\mathbf{z} = -K_1x - K_2v - K_3q
 $$
 
 The gain $K$ is obtained either by **pole placement** (`place`) or by **LQR** (`lqr`) on the augmented pair $(A, B)$. The integral state ensures zero steady-state error and rejection of constant input/output disturbances by construction — no feedforward or reference pre-filter is needed.

@@ -2,14 +2,11 @@
 
 Single electromagnet attracting a ferromagnetic mass against gravity. The plant model derived here is the analytical foundation for every controller in [§2](02_pid.md)–[§7](07_nonlinear_mpc.md) and the prediction model for the EKF in [§8](08_ekf.md).
 
-<p align="center">
-  <img src="sketchs/singleMaglev.png" width="480" alt="Single-magnet system schematic"/>
-  <br><br>
-  <em>Conceptual schematic of the single-magnet system</em><br>
-  &nbsp;&nbsp;— electromagnet at the top with current i<sub>s</sub><br>
-  &nbsp;&nbsp;— ferromagnetic mass below with weight mg<br>
-  &nbsp;&nbsp;— air gap x<sub>s</sub> between them, and the position sensor reading y
-</p>
+<div align="center">
+  <img src="sketchs/singleMaglev.png" width="480" alt="Single-magnet system"/>
+</div>
+
+> **Figure 1.1** — Conceptual schematic of the single-magnet system: electromagnet at the top with current i<sub>s</sub>, ferromagnetic mass below with weight mg, air gap x<sub>s</sub> between them, and position sensor reading y.
 
 ## 1.1 Reluctance Force
 The attractive force of a single electromagnet acting on a ferromagnetic mass is
