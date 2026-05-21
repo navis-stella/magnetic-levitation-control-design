@@ -159,12 +159,14 @@ The figures produced in this folder (`airgap_response.png`, `current_response.pn
 
 Closed-loop performance was evaluated over a 2-second simulation starting from the levitation equilibrium state (nominal air gap: 0.5 mm). Four external disturbances were applied sequentially to assess robustness across the controlled DOFs:
 
+<div align="center">
 | Event | Time | Type | Amplitude |
 |---|---|---|---|
 | $F_y$ impulse | $t = 0.6$ s | Force pulse in $y$ (20 ms) | $-180$ N |
 | $F_x$ step | $t = 1.0$ s | Force step in $x$ | $+60$ N |
 | $F_y$ step | $t = 1.2$ s | Force step in $y$ | $-60$ N |
 | $T_z$ step | $t = 1.4$ s | Torque step about $z$ | $+200$ N·m |
+</div>
 
 This sequence exercises both translational and rotational disturbance channels with a mix of short-duration impulses and persistent step inputs.
 
@@ -177,6 +179,7 @@ All translational and rotational deviations remained at negligible levels throug
 
 > **Figure 13.2** — Sled unit pose trajectory (5-DOF) with measurement noise active.
 
+<div align="center">
 | DOF | Peak Deviation | Settled By | Scale |
 |---|---|---|---|
 | $x$ translation | $\sim 8 \times 10^{-7}$ mm | $\sim 1.5$ s | Nanometre |
@@ -184,6 +187,7 @@ All translational and rotational deviations remained at negligible levels throug
 | Roll | $\sim 1 \times 10^{-9}$ rad | $< 0.1$ s | Numerical noise floor |
 | Pitch | $\sim 8 \times 10^{-11}$ rad | — | Numerical noise floor |
 | Yaw | $\sim 2 \times 10^{-11}$ rad | — | Numerical noise floor |
+</div>
 
 Rotational coupling was effectively zero across all disturbance events. This confirms that the state-space controller — with the explicit translation–rotation coupling captured in the mass-inertia matrix of S3 — successfully decouples the controlled DOFs in closed loop, despite the CoM offset that makes those couplings non-trivial in the open-loop plant.
 
@@ -197,38 +201,43 @@ Rotational coupling was effectively zero across all disturbance events. This con
 
 **Startup transient.** The closed loop drives all eight air gaps from their initial values (asymmetric because of the rest pose) to the common 0.5 mm setpoint:
 
+<div align="center">
 | | Upper magnets (ELO, ERO, SLO, SRO) | Lower magnets (ELU, ERU, SLU, SRU) |
 |---|---|---|
 | Initial value | $\sim 0.525$ mm | $\sim 0.477$ mm |
 | Setpoint | $0.500$ mm | $0.500$ mm |
 | Overshoot / undershoot | $+5.0\%$ | $-4.6\%$ |
 | Settling time ($\pm 1\%$) | $\sim 0.40$ s | $\sim 0.45$ s |
+</div>
 
 The initial overshoot of $\approx 5\%$ is well within the accepted range for active magnetic bearing systems (typical threshold $\leq 10$–$15\%$) and originates primarily from the Simscape mechanical solver's transient at simulation start. The four magnets within each group (upper, lower) exhibit fully symmetrical responses, confirming uniform load distribution and geometric consistency of the model.
 
 **Steady-state performance.** After the startup transient:
 
+<div align="center">
 | Metric | Value |
 |---|---|
 | Mean steady-state air gap | $0.500$ mm (on setpoint) |
 | Steady-state ripple | $\pm 0.005$ mm ($\pm 1.0\%$ of setpoint) |
 | Ripple source | Transform-sensor numerical noise and integrator-induced micro-oscillation |
+</div>
 
 The $\pm 1\%$ steady-state ripple does not affect levitation stability and is at the threshold of what the Simscape sensors can resolve.
 
 **Disturbance rejection.**
-
+<div align="center">
 | Disturbance | Peak air-gap deviation | Recovery time |
 |---|---|---|
 | $F_y$ impulse $-180$ N (20 ms) | $< \pm 0.005$ mm | $< 0.05$ s |
 | $F_x$ step $+60$ N | $\sim -0.005$ mm | $< 0.10$ s |
 | $F_y$ step $-60$ N | barely measurable | $< 0.05$ s |
 | $T_z$ step $+200$ N·m | barely measurable | $< 0.05$ s |
+</div>
 
 Disturbance rejection is strong across all input channels. Even the 200 N·m torque step — the most severe test case — produced no measurable steady-state air-gap deviation, demonstrating that the integral action in all five DOFs absorbs persistent disturbances effectively.
 
 ### 13.6.4 Summary
-
+<div align="center">
 | Performance criterion | Result | Assessment |
 |---|---|---|
 | Startup overshoot | $\approx 5\%$ | Acceptable |
@@ -237,6 +246,7 @@ Disturbance rejection is strong across all input channels. Even the 200 N·m tor
 | Disturbance rejection | $< 0.005$ mm deviation | Excellent |
 | DOF decoupling | rotations at noise floor | Excellent |
 | Air-gap symmetry | all four magnets per group overlap | Excellent |
+</div>
 
 The state-space controller demonstrates stable levitation, strong disturbance rejection, and effective multi-DOF decoupling under all tested load conditions. The system maintains the nominal 0.5 mm air gap within $\pm 1\%$ in steady state and recovers from transient disturbances within 0.1 s.
 

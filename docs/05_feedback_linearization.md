@@ -52,7 +52,7 @@ The input $u$ first appears in $\ddot{y}$, so the **relative degree is $r = 2$**
 Introduce the virtual input $v$ such that $\ddot{y} = v$:
 
 $$
--g + \frac{K_m}{m  (x_0 - x_1)^2}  u = v \quad\Longrightarrow\quad u = \frac{m  (x_0 - x_1)^2}{K_m}  (v + g)
+-g + \frac{K_m}{m  (x_0 - x_1)^2} \bullet u = v \quad\Longrightarrow\quad u = \frac{m  (x_0 - x_1)^2}{K_m} \bullet (v + g)
 $$
 
 and the physical current command is

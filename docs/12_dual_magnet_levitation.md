@@ -15,7 +15,15 @@ There is no rotational moment to consider. The controller drives the sled to a s
 <div align="center">
   <img src="sketchs/dualMaglev.png" width="360" alt="Single-magnet system"/>
 </div>
-> **Figure** — System sketch showing the upper armature surface frame (`upArmaSfGS`), upper magnet surface frame (`upMagSfGS`), sled global coordinate system (`SUGCS`), lower magnet surface frame (`lwMagSfGS`), and lower armature surface frame (`lwArmaSfGS`). The z-axis of each magnet surface points outward (into the air gap); the z-axis of each armature surface points inward (into the armature body).
+
+ **Figure** — System sketch: **dualMagnetLevitation_sketch.png**
+> showing the upper armature surface frame (`upArmaSfGS`),
+> upper magnet surface frame (`upMagSfGS`),
+> sled global coordinate system (`SUGCS`),
+> lower magnet surface frame (`lwMagSfGS`),
+> and lower armature surface frame (`lwArmaSfGS`).
+> The z-axis of each magnet surface points outward (into the air gap);
+> the z-axis of each armature surface points inward (into the armature body).
 
 The dynamics is one-dimensional, but the modeling apparatus introduced here scales without modification to 6-DOF systems — which is the entire point of the exercise.
 

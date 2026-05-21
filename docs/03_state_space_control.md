@@ -1,6 +1,6 @@
 # 3. State-Space Control with Integral Action
 
-The PID design of §2 adds integral action by raising the order of a SISO controller. The state-space formulation does the same thing more transparently: the integral of the tracking error becomes an additional **state**, and a single feedback gain matrix handles regulation, damping, and steady-state error in one design step.
+The PID design of [§2](02_pid.md) adds integral action by raising the order of a SISO controller. The state-space formulation does the same thing more transparently: the integral of the tracking error becomes an additional **state**, and a single feedback gain matrix handles regulation, damping, and steady-state error in one design step.
 
 ## 3.1 Augmented State
 With reference $x_{\text{ref}} = 0$, define the integral state
