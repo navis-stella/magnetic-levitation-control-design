@@ -8,7 +8,7 @@ The plant is the control-affine form $u = i_s^2$ (see [§5.1](05_feedback_linear
 Define the first error variable and choose its desired dynamics through a virtual control:
 
 $$
-z_1 = x_1,\qquad \alpha_1 = -c_1 z_1\;(c_1 > 0),\qquad z_2 = x_2 - \alpha_1 = x_2 + c_1 x_1
+z_1 = x_1,\qquad \alpha_1 = -c_1 z_1 (c_1 > 0),\qquad z_2 = x_2 - \alpha_1 = x_2 + c_1 x_1
 $$
 
 With $V_1 = \tfrac{1}{2}z_1^2$, the derivative along trajectories is
