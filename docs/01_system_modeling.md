@@ -1,8 +1,8 @@
 # 1. System Modeling
 
-Single electromagnet attracting a ferromagnetic mass against gravity. The plant model derived here is the analytical foundation for every controller in §2–§7 and the prediction model for the EKF in §8.
+Single electromagnet attracting a ferromagnetic mass against gravity. The plant model derived here is the analytical foundation for every controller in [§2](docs/02_pid.md)–[§7](docs/07_nonlinear_mpc.md) and the prediction model for the EKF in [§8](docs/08_ekf.md).
 
-> **Figure to be added** — Conceptual schematic of the single-magnet system: electromagnet at the top with current $i_s$, ferromagnetic mass below with weight $mg$, air gap $x_s$ between them, and the position sensor reading $y$.
+> ![System Schematic](sketchs/singleMaglev.png) — Conceptual schematic of the single-magnet system: electromagnet at the top with current $i_s$, ferromagnetic mass below with weight $mg$, air gap $x_s$ between them, and the position sensor reading $y$.
 
 ## 1.1 Reluctance Force
 The attractive force of a single electromagnet acting on a ferromagnetic mass is
