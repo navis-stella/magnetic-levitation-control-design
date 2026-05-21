@@ -118,13 +118,13 @@ Km = ElectromagnetConfig.MagConst;  % [N·m²/A²]
 % #########################################################################
 %% --- Completion Message ---
 % #########################################################################
-fprintf('\n%s\n', repmat('-', 1, 80));
-fprintf('  Simulation parameters successfully loaded.\n');
-fprintf('  Operating Point : x_eq = %.1f mm  |  Mass = %.1f kg\n', airgap_soll, mass);
-
-statusNoise = ["disabled", "active"];
-fprintf('  Noise           : %s  |  sigma_n = %.2g mm\n', ...
-        statusNoise(isNoiseActive + 1), sigma_n);
-fprintf('  Disturbance Step: %.1f N at t = %.2f s\n', Ext_Fina_Val, T_stp);
-% fprintf('  Km              : %.4e N·m²/A²\n', Km);
-fprintf('%s\n\n', repmat('-', 1, 80));
+% fprintf('\n%s\n', repmat('-', 1, 80));
+% fprintf('  Simulation parameters successfully loaded.\n');
+% fprintf('  Operating Point : x_eq = %.1f mm  |  Mass = %.1f kg\n', airgap_soll, mass);
+% 
+% statusNoise = ["disabled", "active"];
+% fprintf('  Noise           : %s  |  sigma_n = %.2g mm\n', ...
+%         statusNoise(isNoiseActive + 1), sigma_n);
+% fprintf('  Disturbance Step: %.1f N at t = %.2f s\n', Ext_Fina_Val, T_stp);
+% % fprintf('  Km              : %.4e N·m²/A²\n', Km);
+% fprintf('%s\n\n', repmat('-', 1, 80));

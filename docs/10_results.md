@@ -3,7 +3,7 @@
 The script `evaluation_controllers.m` (see [§9](09_evaluation_framework.md)) runs every EKF-based controller against the same plant, the same EKF, the same step reference (initial air gap 2.5 mm → target 2.0 mm), and the same disturbance and measurement-noise profiles defined in `setup_sim_params.m`. All five controllers are evaluated with **noise active** on the position measurement — the realistic scenario that mirrors hardware deployment.
 
 <div align="center">
-  <img src="../02_Control_Design_SingleMagnet_Levitation/Results/TimeResponse_Noise_active.png" width="720" alt="Time Response"/>
+  <img src="../02_Control_Design_SingleMagnet_Levitation/Results/TimeResponse_Noise_enabled.png" width="720" alt="Time Response"/>
 </div>
 
 > **Figure 10.1** — Air-gap trajectories of PID, SSC, FBL+SSC, Backstepping, and SMC.
@@ -11,7 +11,7 @@ The script `evaluation_controllers.m` (see [§9](09_evaluation_framework.md)) ru
 > Bottom-left: settling subplot (0 ≤ t ≤ 0.3 s). Bottom-right: steady-state region (t > 0.8 s).
 
 <div align="center">
-  <img src="../02_Control_Design_SingleMagnet_Levitation/Results/PerformanceCriteria_Noise_active.png" width="720" alt="Performance Criteria"/>
+  <img src="../02_Control_Design_SingleMagnet_Levitation/Results/PerformanceCriteria_Noise_enabled.png" width="720" alt="Performance Criteria"/>
 </div>
 
 > **Figure 10.2** — Bar-chart comparison of overshoot, rise time, settling time,

@@ -338,7 +338,7 @@ end
 
 % --- Filename suffix based on noise status ---
 if isNoiseActive
-    noise_tag = 'Noise_active';
+    noise_tag = 'Noise_enabled';
 else
     noise_tag = 'Noise_disabled';
 end
@@ -359,6 +359,9 @@ exportgraphics(fig2, fullfile(RESULTS_PATH, [fname2 '.png']), ...
     'Resolution', 300);
 exportgraphics(fig2, fullfile(RESULTS_PATH, [fname2 '.pdf']), ...
     'ContentType', 'vector');
+
+% --- Simulation results ---
+save(fullfile(RESULTS_PATH, sprintf('simulation_results_%s_%s.mat', noise_tag)), 'results');
 
 fprintf('  Plots saved in: %s\n', RESULTS_PATH);
 fprintf('    %s.png/.pdf\n', fname1);

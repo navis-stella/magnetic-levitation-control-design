@@ -26,6 +26,10 @@ The **geometric center of the sled** is the reference for all kinematic descript
 - The **equilibrium pose** — sled geometric center aligned with the geometric center of the machine stand, all eight air gaps at their nominal value. This is the operating point about which the plant is linearized.
 - The **rest pose** — sled physically rests on its supports with the lower air gaps closed to zero. This is the natural initial condition before levitation is activated.
 
+The closed-loop evaluation in [§13.6](#136-evaluation-and-results) starts from the **equilibrium pose**, not the rest pose. This is intentional: the deviation from the rest pose to the equilibrium pose is approximately $-0.5$ mm in the $y$-direction, which lies well outside the valid linearization region. A linear state-space controller cannot stabilize the system from such a large initial deviation — the linearized model no longer accurately represents the nonlinear plant dynamics at that distance from the operating point.
+
+In a practical deployment, a **soft-start routine** would first drive the sled from the rest pose to a neighborhood of the equilibrium pose using a nonlinear open-loop current profile, and only then hand control over to the SSC. Designing such a routine is a well-defined engineering task but falls outside the scope of this project, which focuses on the control design and verification within the linearization region.
+
 <div align="center">
   <img src="sketchs/sled_control_schematic.png" width="720" alt="Time Response"/>
 </div>
