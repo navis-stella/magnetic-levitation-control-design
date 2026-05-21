@@ -61,9 +61,14 @@ fig_position = [50, 50, 1400, 800];  % [left, bottom, width, height] in pixels
 noise_labels = {"off", "on"};
 fprintf('Starting simulation (T = %.1f s, Noise = %s) ...\n', ...
         T_sim, noise_labels{noise_switch + 1});
-
 noise_tag = 'noise_' + noise_labels{noise_switch + 1};
 
+% load model parameters into Model-Workspace
+load_system('SledUnit_Levitation_Control');
+hws = get_param('SledUnit_Levitation_Control', 'ModelWorkspace');
+evalin(hws, "run('.\Setup_Machine_Model\setup_structure_params.m')");  
+
+% run simulation
 simOut = sim('SledUnit_Levitation_Control.slx', ...
              'StopTime',                num2str(T_sim), ...
              'SignalLoggingName',       'logsout', ...
