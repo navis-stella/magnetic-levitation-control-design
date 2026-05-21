@@ -20,8 +20,8 @@
 T_sim = 2; 
 
 % Toggle switch for sensor noise (0 -> OFF; 1 -> ON)
-% Die Rauschspezifikationen wurden im Skript
-% '.\Setup_Machine_Model\init_system_const.m' definiert.
+% The noise specifications were defined in the script
+% '.\Setup_Machine_Model\init_system_const.m'.
 noise_switch = 0; 
 
 %% Disturbance Configuration
