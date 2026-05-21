@@ -5,16 +5,17 @@ Single electromagnet attracting a ferromagnetic mass against gravity. The plant 
 <p align="center">
   <img src="sketchs/singleMaglev.png" width="480" alt="Single-magnet system schematic"/>
   <br><br>
-  <em>Conceptual schematic of the single-magnet system: electromagnet at the top
-  with current i<sub>s</sub>, ferromagnetic mass below with weight mg, air gap x<sub>s</sub>
-  between them, and the position sensor reading y.</em>
+  <em>Conceptual schematic of the single-magnet system</em><br>
+  &nbsp;&nbsp;— electromagnet at the top with current i<sub>s</sub><br>
+  &nbsp;&nbsp;— ferromagnetic mass below with weight mg<br>
+  &nbsp;&nbsp;— air gap x<sub>s</sub> between them, and the position sensor reading y
 </p>
 
 ## 1.1 Reluctance Force
 The attractive force of a single electromagnet acting on a ferromagnetic mass is
 
 $$
-F_R(x_s, i_s) = \frac{\mu_0 N^2 A}{2}\cdot\frac{i_s^2}{x_s^2} = K_M\,\frac{i_s^2}{x_s^2},\qquad K_M = \frac{\mu_0 N^2 A}{2}
+F_R(x_s, i_s) = \frac{\mu_0 N^2 A}{2}\cdot\frac{i_s^2}{x_s^2} = K_M\bullet\frac{i_s^2}{x_s^2},\qquad K_M = \frac{\mu_0 N^2 A}{2}
 $$
 
 where $i_s$ is the coil current and $x_s$ the air gap.
@@ -23,7 +24,7 @@ where $i_s$ is the coil current and $x_s$ the air gap.
 Static levitation requires the reluctance force to balance gravity:
 
 $$
-K_M\,\frac{i_0^2}{x_0^2} = mg \quad\Longrightarrow\quad i_0 = \frac{x_0}{N}\sqrt{\frac{2mg}{\mu_0 A}}
+K_M\bullet\frac{i_0^2}{x_0^2} = mg \quad\Longrightarrow\quad i_0 = \frac{x_0}{N}\sqrt{\frac{2mg}{\mu_0 A}}
 $$
 
 ## 1.3 Deviation Variables
@@ -39,13 +40,13 @@ A positive $x$ corresponds to a *smaller* air gap and therefore a *larger* reluc
 A first-order Taylor expansion of $F_R - F_g$ about $(x_0, i_0)$ yields the linearized plant
 
 $$
-m\ddot{x} = k_x\,x + k_i\,i
+m\ddot{x} = k_x x + k_i i
 $$
 
 with the position- and current-stiffness coefficients
 
 $$
-k_x = 2K_M\,\frac{i_0^2}{x_0^3} = \frac{2mg}{x_0},\qquad k_i = 2K_M\,\frac{i_0}{x_0^2} = \frac{2mg}{i_0}
+k_x = 2K_M \frac{i_0^2}{x_0^3} = \frac{2mg}{x_0},\qquad k_i = 2K_M \frac{i_0}{x_0^2} = \frac{2mg}{i_0}
 $$
 
 Both $k_x, k_i > 0$, so the open-loop plant has an unstable real pole at $s = +\sqrt{k_x/m} = \sqrt{2g/x_0} \approx 99\,\text{rad/s}$. Active feedback is therefore not a design choice but a stability prerequisite.
