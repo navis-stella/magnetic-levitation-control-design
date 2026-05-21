@@ -16,7 +16,7 @@ There is no rotational moment to consider. The controller drives the sled to a s
   <img src="sketchs/dualMaglev.png" width="360" alt="Single-magnet system"/>
 </div>
 
-> **Figure** — System sketch: **dualMagnetLevitation_sketch.png**
+> **Figure** — dualMagnetLevitation sketch:
 > showing the upper armature surface frame (`upArmaSfGS`),
 > upper magnet surface frame (`upMagSfGS`),
 > sled global coordinate system (`SUGCS`),
