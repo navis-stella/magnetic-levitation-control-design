@@ -11,7 +11,7 @@ The maglev plant has nonlinear dynamics, hard input constraints (amplifier curre
 At each sampling instant, the controller solves
 
 $$
-\min_{u_0, \ldots, u_{N-1}}\;\; \sum_{k=0}^{N-1}\Big(\mathbf{x}_k^\top Q\,\mathbf{x}_k \;+\; u_k^\top R\,u_k\Big) \;+\; \mathbf{x}_N^\top Q_N\,\mathbf{x}_N
+\min_{u_0, \ldots, u_{N-1}}\enspace \enspace  \sum_{k=0}^{N-1}\Big(\mathbf{x}_k^\top Q\,\mathbf{x}_k \enspace +\enspace  u_k^\top R\,u_k\Big) \enspace +\enspace  \mathbf{x}_N^\top Q_N\,\mathbf{x}_N
 $$
 
 subject to

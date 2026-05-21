@@ -23,7 +23,7 @@ $$
 Differentiating with respect to $\mathbf{x}$ gives the discrete state Jacobian
 
 $$
-F_d(\hat{\mathbf{x}}, i_s) = I + T_s\,F_c,\qquad F_c = \begin{bmatrix} 0 & 1 \\[6pt] \dfrac{2 K_m\,i_s^2}{m\,(x_0 - \hat{x}_1)^3} & 0 \end{bmatrix}
+F_d(\hat{\mathbf{x}}, i_s) = I + T_s\,F_c,\qquad F_c = \begin{bmatrix} 0 & 1 \\\\[6pt] \dfrac{2 K_m\,i_s^2}{m\,(x_0 - \hat{x}_1)^3} & 0 \end{bmatrix}
 $$
 
 evaluated symbolically once in `design_EKF.m` and computed at runtime at each prediction step. The output Jacobian is the constant $H = [1\ \ 0]$ since only position is measured.

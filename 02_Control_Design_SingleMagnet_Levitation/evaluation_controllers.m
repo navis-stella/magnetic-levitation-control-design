@@ -347,14 +347,14 @@ end
 timestamp = datetime('now', 'Format', 'yyyyMMdd_HHmm');
 
 % --- Figure 1: Time Response ---
-fname1 = sprintf('TimeResponse_%s_%s', noise_tag);
+fname1 = sprintf('TimeResponse_%s', noise_tag);
 exportgraphics(fig1, fullfile(RESULTS_PATH, [fname1 '.png']), ...
     'Resolution', 300);
 exportgraphics(fig1, fullfile(RESULTS_PATH, [fname1 '.pdf']), ...
     'ContentType', 'vector');
 
 % --- Figure 2: Performance Criteria ---
-fname2 = sprintf('PerformanceCriteria_%s_%s', noise_tag);
+fname2 = sprintf('PerformanceCriteria_%s', noise_tag);
 exportgraphics(fig2, fullfile(RESULTS_PATH, [fname2 '.png']), ...
     'Resolution', 300);
 exportgraphics(fig2, fullfile(RESULTS_PATH, [fname2 '.pdf']), ...

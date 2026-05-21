@@ -64,7 +64,7 @@ The controller is a state-space controller with integral action — the same des
 **Step 1 — Equilibrium currents via constrained optimization.** The force-balance equation
 
 $$
-K_m\,\frac{i_{\text{up}}^2}{x_{\text{up},0}^2} \;-\; K_m\,\frac{i_{\text{lw}}^2}{x_{\text{lw},0}^2} \;=\; m\,g
+K_m\,\frac{i_{\text{up}}^2}{x_{\text{up},0}^2} \enspace -\enspace  K_m\,\frac{i_{\text{lw}}^2}{x_{\text{lw},0}^2} \enspace =\enspace  m\,g
 $$
 
 admits a one-parameter family of solutions in the $(i_{\text{up}}, i_{\text{lw}})$ plane. The selected pair $(i_{\text{up},0}, i_{\text{lw},0})$ is the one that minimizes total electrical power $i_{\text{up}}^2 + i_{\text{lw}}^2$ subject to the equilibrium constraint and the amplifier current bounds, solved numerically with `fmincon`.
@@ -86,7 +86,7 @@ $$
 with the dual-magnet stiffness coefficients
 
 $$
-k_x = 2 K_m\!\left(\frac{i_{\text{up},0}^2}{x_{\text{up},0}^3} + \frac{i_{\text{lw},0}^2}{x_{\text{lw},0}^3}\right),\qquad k_i = 2 K_m\!\left(\frac{i_{\text{up},0}}{x_{\text{up},0}^2} + \frac{i_{\text{lw},0}}{x_{\text{lw},0}^2}\right)
+k_x = 2 K_m\left(\frac{i_{\text{up},0}^2}{x_{\text{up},0}^3} + \frac{i_{\text{lw},0}^2}{x_{\text{lw},0}^3}\right),\qquad k_i = 2 K_m\left(\frac{i_{\text{up},0}}{x_{\text{up},0}^2} + \frac{i_{\text{lw},0}}{x_{\text{lw},0}^2}\right)
 $$
 
 Both coefficients are strictly positive — each magnet pair contributes additively, so the open-loop plant remains unstable, exactly as in [§1.4](01_system_modeling.md). **Sanity check**: setting $i_{\text{lw},0} = 0$ reduces these expressions to $k_x = 2mg/x_{\text{up},0}$ and $k_i = 2mg/i_{\text{up},0}$, recovering the single-magnet linearization identically.

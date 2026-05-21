@@ -24,7 +24,7 @@ $$
 with
 
 $$
-f(\mathbf{x}) = \begin{bmatrix} x_2 \\ -g \end{bmatrix},\qquad g(\mathbf{x}) = \begin{bmatrix} 0 \qquad \\ \dfrac{K_m}{m (x_0 - x_1)^2} \end{bmatrix}
+f(\mathbf{x}) = \begin{bmatrix} x_2 \\\\ -g \end{bmatrix},\qquad g(\mathbf{x}) = \begin{bmatrix} 0 \qquad \\\\ \dfrac{K_m}{m (x_0 - x_1)^2} \end{bmatrix}
 $$
 
 The actual current is recovered downstream as $i_s = \sqrt{u}$ (positive root), saturated to the amplifier range. This same $u = i_s^2$ substitution is reused by Backstepping ([§4](04_backstepping.md)) and SMC ([§6](06_sliding_mode_control.md)).

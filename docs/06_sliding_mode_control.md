@@ -30,13 +30,13 @@ $$
 The exponential reaching law combines a switching term with a proportional term:
 
 $$
-\dot{s} = -\eta \theta(s) - K s
+\dot{s} = -\eta \bullet \theta(s) - K s
 $$
 
 A pure sign function produces chattering. Replacing it with a **saturation** of width $\phi$ smooths the switching:
 
 $$
-\theta(s) = \mathrm{sat}\!\left(\frac{s}{\phi}\right) =
+\theta(s) = \mathrm{sat}\left(\frac{s}{\phi}\right) =
 \begin{cases}
 1 & s > \phi \\\\
 s/\phi & |s| \leq \phi \\\\
@@ -52,7 +52,7 @@ Parameter roles:
 ## 6.4 Full Control Law
 
 $$
-u = \frac{m(x_0 - x_1)^2}{K_m}\left(g - \lambda x_2 - \eta \mathrm{sat} \left(\frac{s}{\phi}\right) - K s\right)
+u = \frac{m(x_0 - x_1)^2}{K_m}\left(g - \lambda x_2 - \eta \bullet \mathrm{sat} \left(\frac{s}{\phi}\right) - K s\right)
 $$
 
 The physical current command (positive root with safe clamp):
@@ -97,7 +97,7 @@ $$
 Imposing the same exponential reaching law as in §6.3:
 
 $$
-u = \frac{m(x_0 - x_1)^2}{K_m} \Bigl( g - k_i x_1 - \lambda x_2 - \eta \mathrm{sat}\!\left(\tfrac{s}{\phi}\right) - K s \Bigr)
+u = \frac{m(x_0 - x_1)^2}{K_m} \left( g - k_i x_1 - \lambda x_2 - \eta \bullet \mathrm{sat} \left(\tfrac{s}{\phi}\right) - K s \right)
 $$
 
 **Sliding dynamics.** On $s = 0$, differentiation gives the homogeneous second-order ODE

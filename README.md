@@ -121,10 +121,15 @@ A 5-DOF magnetically levitated sled with eight electromagnets (over-actuated, wi
 
 The five integral-action controllers were benchmarked on the single-magnet plant under realistic measurement-noise conditions, with the same EKF feeding every controller. All five achieve sub-micrometer steady-state precision; their transient performance differs in characteristic ways.
 
-> **Figure to be added — `Results/TimeResponse_Noise_active_.png`**
+<div align="center">
+  <img src="02_Control_Design_SingleMagnet_Levitation/Results/TimeResponse_Noise_active.png" width="360" alt="Single-magnet system"/>
+</div>
 > Air-gap time response of PID, SSC, Backstepping, FBL+SSC, and SMC under identical step + disturbance test conditions.
 
-> **Figure to be added — `Results/PerformanceCriteria_Noise_active_.png`**
+
+<div align="center">
+  <img src="02_Control_Design_SingleMagnet_Levitation/Results/PerformanceCriteria_Noise_active.png" width="360" alt="Single-magnet system"/>
+</div>
 > Bar-chart comparison: overshoot, rise time, settling time, steady-state error.
 
 Three observations stand out and are unpacked in [§10](docs/10_results.md) and [§11](docs/11_comparative_analysis.md):
