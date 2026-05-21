@@ -12,14 +12,16 @@ $$
 
 There is no rotational moment to consider. The controller drives the sled to a state in which the two air gaps are equal by default, but the design script accepts independent target values for the upper and lower gaps if asymmetric operation is desired.
 
-> **Figure to be added — `dualMagnetLevitation_sketch.png`**
-> System sketch showing the upper armature surface frame (`upArmaSfGS`), upper magnet surface frame (`upMagSfGS`), sled global coordinate system (`SUGCS`), lower magnet surface frame (`lwMagSfGS`), and lower armature surface frame (`lwArmaSfGS`). The z-axis of each magnet surface points outward (into the air gap); the z-axis of each armature surface points inward (into the armature body).
+<div align="center">
+  <img src="sketchs/dualMaglev.png" width="360" alt="Single-magnet system"/>
+</div>
+> **Figure** — System sketch showing the upper armature surface frame (`upArmaSfGS`), upper magnet surface frame (`upMagSfGS`), sled global coordinate system (`SUGCS`), lower magnet surface frame (`lwMagSfGS`), and lower armature surface frame (`lwArmaSfGS`). The z-axis of each magnet surface points outward (into the air gap); the z-axis of each armature surface points inward (into the armature body).
 
 The dynamics is one-dimensional, but the modeling apparatus introduced here scales without modification to 6-DOF systems — which is the entire point of the exercise.
 
 ## 12.2 Why Multibody Instead of Hand-Derived Equations
 
-For the single-magnet plant in [§1.1](01_system_modeling.md), writing $m\ddot{x} = K_M\,i_s^2/x_s^2 - mg$ by hand was straightforward. As soon as the system gains additional bodies, joints, or degrees of freedom, hand-derivation becomes error-prone: every body needs a kinematic transformation, every force needs projection to the center of mass, every constraint needs explicit handling.
+For the single-magnet plant in [§1.1](01_system_modeling.md), writing $m\ddot{x} = K_M  i_s^2/x_s^2 - mg$ by hand was straightforward. As soon as the system gains additional bodies, joints, or degrees of freedom, hand-derivation becomes error-prone: every body needs a kinematic transformation, every force needs projection to the center of mass, every constraint needs explicit handling.
 
 Simscape Multibody removes that burden. The user defines bodies with geometry, mass, and frames; connects them with joints; and applies forces at their natural points of action. The solver computes the equivalent dynamics automatically. This chapter exists to **build confidence in that workflow on a problem simple enough to verify analytically**, before applying the same workflow to a system whose closed-form equations would be impractical.
 
@@ -64,7 +66,7 @@ The controller is a state-space controller with integral action — the same des
 **Step 1 — Equilibrium currents via constrained optimization.** The force-balance equation
 
 $$
-K_m\,\frac{i_{\text{up}}^2}{x_{\text{up},0}^2} \enspace -\enspace  K_m\,\frac{i_{\text{lw}}^2}{x_{\text{lw},0}^2} \enspace =\enspace  m\,g
+K_m  \frac{i_{\text{up}}^2}{x_{\text{up},0}^2} \enspace -\enspace  K_m  \frac{i_{\text{lw}}^2}{x_{\text{lw},0}^2} \enspace =\enspace  m  g
 $$
 
 admits a one-parameter family of solutions in the $(i_{\text{up}}, i_{\text{lw}})$ plane. The selected pair $(i_{\text{up},0}, i_{\text{lw},0})$ is the one that minimizes total electrical power $i_{\text{up}}^2 + i_{\text{lw}}^2$ subject to the equilibrium constraint and the amplifier current bounds, solved numerically with `fmincon`.
@@ -80,7 +82,7 @@ A positive $i_{\text{dev}}$ produces a net upward force by simultaneously increa
 The sled is rigid, so a position deviation $x$ (positive upward) makes the upper gap smaller by $x$ and the lower gap larger by $x$. Substituting and taking the first-order Taylor expansion yields
 
 $$
-m\,\ddot{x} = k_x\,x + k_i\,i_{\text{dev}}
+m  \ddot{x} = k_x  x + k_i  i_{\text{dev}}
 $$
 
 with the dual-magnet stiffness coefficients
@@ -94,7 +96,7 @@ Both coefficients are strictly positive — each magnet pair contributes additiv
 **Step 3 — Augmented state-space controller.** Following [§3](03_state_space_control.md), the integral of position is added as a state:
 
 $$
-\mathbf{z} = [x, v, q]^\top,\qquad \dot{\mathbf{z}} = A_{\text{aug}}\,\mathbf{z} + B_{\text{aug}}\,i_{\text{dev}}
+\mathbf{z} = [x, v, q]^\top,\qquad \dot{\mathbf{z}} = A_{\text{aug}}  \mathbf{z} + B_{\text{aug}}  i_{\text{dev}}
 $$
 
 The feedback gain $K$ is computed by pole placement or LQR exactly as in [§3](03_state_space_control.md). The controller outputs the virtual input $i_{\text{dev}}$, which is mapped back to physical current commands $(i_{\text{up}}, i_{\text{lw}})$ via the differential-drive relation of Step 2.

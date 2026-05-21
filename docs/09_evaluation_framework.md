@@ -18,8 +18,8 @@ The `_ideal` variants (`Maglev_SSC_ideal.slx`, `Maglev_SMC_block_ideal.slx`) are
 ## Output Files
 
 The script writes to `Results/`:
-- `TimeResponse_Noise_active_.png` — overlay of air-gap trajectories with a settling-process subplot and a steady-state-region subplot.
-- `PerformanceCriteria_Noise_active_.png` — bar chart comparing overshoot, rise time, settling time, and steady-state error across the five controllers.
+- `TimeResponse_Noise_active.png` — overlay of air-gap trajectories with a settling-process subplot and a steady-state-region subplot.
+- `PerformanceCriteria_Noise_active.png` — bar chart comparing overshoot, rise time, settling time, and steady-state error across the five controllers.
 - `simulation_results.mat` — raw signals from each run, available for any user-defined post-processing.
 
 ## Convention for Plotted Coordinates

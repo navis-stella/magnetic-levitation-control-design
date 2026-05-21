@@ -26,8 +26,10 @@ The **geometric center of the sled** is the reference for all kinematic descript
 - The **equilibrium pose** — sled geometric center aligned with the geometric center of the machine stand, all eight air gaps at their nominal value. This is the operating point about which the plant is linearized.
 - The **rest pose** — sled physically rests on its supports with the lower air gaps closed to zero. This is the natural initial condition before levitation is activated.
 
-> **Figure to be added — top-level layout of `SledUnit_Levitation_Control.slx`**
-> Top-level Simulink view showing the State-Space Controller with State Estimator subsystem on the upper right, the CAD-rendered plant subsystems (Machine Frame, Spindle Actuator & Sensor, Sled Tail Actuator & Sensor, Sled Unit) in the lower half, and the visualization panels (current values, air-gap measurements, sled state) on the left. Each subsystem will be annotated.
+<div align="center">
+  <img src="sketchs/sled_control_schematic.png" width="720" alt="Time Response"/>
+</div>
+>**Figure** Top-level Simulink view showing the State-Space Controller with State Estimator subsystem on the upper right, the CAD-rendered plant subsystems (Machine Frame, Spindle Actuator & Sensor, Sled Tail Actuator & Sensor, Sled Unit) in the lower half, and the visualization panels (current values, air-gap measurements, sled state) on the left. Each subsystem will be annotated.
 
 ## 13.2 CAD-Based Multibody Modeling
 
@@ -112,19 +114,19 @@ The $z$-translation row is dropped because that DOF is mechanically constrained.
 **S3 — Linearized state-space model.** The 10-dimensional state $\mathbf{x} = [\mathbf{q}; \dot{\mathbf{q}}]^\top$ and 8-dimensional input $\mathbf{u} = \mathbf{i}_\text{dev}$ assemble into
 
 $$
-\ddot{\mathbf{q}} = M^{-1}\bigl(K_s\,\mathbf{q} + K_i\,\mathbf{u}\bigr)
+\ddot{\mathbf{q}} = M^{-1}\bigl(K_s  \mathbf{q} + K_i  \mathbf{u}\bigr)
 $$
 
 The **mass-inertia matrix $M$ contains the off-diagonal terms** that arise from the CoM offset: a translational acceleration generates an angular impulse about the geometric center, and vice versa. These cross-terms are essential for closed-loop stability and would be missed by any decentralized design. Controllability is verified explicitly via the PBH test before the gain design proceeds.
 
 **S4 — Augmented LQR with anti-windup.** Following [§3](03_state_space_control.md), five integral states (one per controlled DOF) are appended, producing a 15-state augmented system. The LQR design uses block-diagonal weights, with *substantially larger* integrator weights on the rotational channels — necessary because angular deviations have a numerically smaller scale than translational deviations, and equal weighting would under-penalize them. The anti-windup gain $K_\text{aw}$ is computed as the pseudoinverse of the integral-state gain block, applying the back-calculation pattern of [§2](02_pid.md) generalized to the MIMO case.
 
-**S5 — Sensor-to-DOF kinematic mapping.** The measurement model is the over-determined linear map $\mathbf{y} = H\,\mathbf{q}$, $H \in \mathbb{R}^{8 \times 5}$, where each row is the projection of position onto the corresponding magnet's local air-gap axis. The redundancy is a robustness benefit: a least-squares pseudoinverse $H^\dagger$ recovers the pose from any consistent measurement vector, with graceful degradation if a single sensor channel is corrupted.
+**S5 — Sensor-to-DOF kinematic mapping.** The measurement model is the over-determined linear map $\mathbf{y} = H  \mathbf{q}$, $H \in \mathbb{R}^{8 \times 5}$, where each row is the projection of position onto the corresponding magnet's local air-gap axis. The redundancy is a robustness benefit: a least-squares pseudoinverse $H^\dagger$ recovers the pose from any consistent measurement vector, with graceful degradation if a single sensor channel is corrupted.
 
 **S6 — Observer design (pole placement *or* Kalman filter).** The observer has the standard form
 
 $$
-\dot{\hat{\mathbf{x}}} = A\,\hat{\mathbf{x}} + B\,\mathbf{u} + L_\text{obs}\bigl(\mathbf{y} - C_\text{obs}\,\hat{\mathbf{x}}\bigr)
+\dot{\hat{\mathbf{x}}} = A  \hat{\mathbf{x}} + B  \mathbf{u} + L_\text{obs}\bigl(\mathbf{y} - C_\text{obs}  \hat{\mathbf{x}}\bigr)
 $$
 
 and the script implements two designs selectable via a flag:
@@ -168,6 +170,10 @@ This sequence exercises both translational and rotational disturbance channels w
 ### 13.6.2 Sled Pose Response
 
 All translational and rotational deviations remained at negligible levels throughout the simulation:
+<div align="center">
+  <img src="../04_Control_Design_SledUnit_Levitation/Results/sled_unit_pose_noise_on.png" width="720" alt="Sled unit pose"/>
+</div>
+> **Figure 13.1** — Sled unit pose trajectory (5-DOF) with measurement noise active.
 
 | DOF | Peak Deviation | Settled By | Scale |
 |---|---|---|---|
@@ -180,6 +186,11 @@ All translational and rotational deviations remained at negligible levels throug
 Rotational coupling was effectively zero across all disturbance events. This confirms that the state-space controller — with the explicit translation–rotation coupling captured in the mass-inertia matrix of S3 — successfully decouples the controlled DOFs in closed loop, despite the CoM offset that makes those couplings non-trivial in the open-loop plant.
 
 ### 13.6.3 Air Gap Response
+
+<div align="center">
+  <img src="../04_Control_Design_SledUnit_Levitation/Results/airgap_profiles_noise_on.png" width="720" alt="Air-gap profiles"/>
+</div>
+> **Figure 13.2** — Air-gap profiles of all eight electromagnets with measurement noise active.
 
 **Startup transient.** The closed loop drives all eight air gaps from their initial values (asymmetric because of the rest pose) to the common 0.5 mm setpoint:
 

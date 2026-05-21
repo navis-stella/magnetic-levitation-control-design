@@ -2,11 +2,20 @@
 
 The script `evaluation_controllers.m` (see [§9](09_evaluation_framework.md)) runs every EKF-based controller against the same plant, the same EKF, the same step reference (initial air gap 2.5 mm → target 2.0 mm), and the same disturbance and measurement-noise profiles defined in `setup_sim_params.m`. All five controllers are evaluated with **noise active** on the position measurement — the realistic scenario that mirrors hardware deployment.
 
-> **Figure to be added — `Results/TimeResponse_Noise_active_.png`**
-> Air-gap trajectories of PID, SSC, FBL+SSC, Backstepping, and SMC. Top: full one-second run with the disturbance event near $t = 0.5\,\text{s}$. Bottom-left: settling subplot ($0 \leq t \leq 0.3\,\text{s}$). Bottom-right: steady-state region ($t > 0.8\,\text{s}$).
+<div align="center">
+  <img src="../02_Control_Design_SingleMagnet_Levitation/Results/TimeResponse_Noise_active_.png" width="720" alt="Time Response"/>
+</div>
 
-> **Figure to be added — `Results/PerformanceCriteria_Noise_active_.png`**
-> Bar-chart comparison of overshoot, rise time, settling time, and steady-state error across the five controllers.
+> **Figure 10.1** — Air-gap trajectories of PID, SSC, FBL+SSC, Backstepping, and SMC.
+> Top: full one-second run with disturbance near t = 0.5 s.
+> Bottom-left: settling subplot (0 ≤ t ≤ 0.3 s). Bottom-right: steady-state region (t > 0.8 s).
+
+<div align="center">
+  <img src="../02_Control_Design_SingleMagnet_Levitation/Results/PerformanceCriteria_Noise_active_.png" width="720" alt="Performance Criteria"/>
+</div>
+
+> **Figure 10.2** — Bar-chart comparison of overshoot, rise time, settling time,
+> and steady-state error across the five controllers.
 
 ## 10.1 Time Response
 

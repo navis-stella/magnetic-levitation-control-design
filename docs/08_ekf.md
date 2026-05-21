@@ -14,16 +14,16 @@ $$
 with output $y = x_1 + n$, where $n$ is zero-mean Gaussian measurement noise from the eddy-current gap sensor.
 
 ## 8.2 Discretization and Jacobian
-The model is discretized by **Euler-forward** at $T_s = 100\,\mu\text{s}$ (10 kHz), roughly ten times faster than the dominant closed-loop dynamics:
+The model is discretized by **Euler-forward** at $T_s = 100  \mu\text{s}$ (10 kHz), roughly ten times faster than the dominant closed-loop dynamics:
 
 $$
-\mathbf{x}_{k+1} = \mathbf{x}_k + T_s\,f(\mathbf{x}_k, i_{s,k})
+\mathbf{x}_{k+1} = \mathbf{x}_k + T_s  f(\mathbf{x}_k, i_{s,k})
 $$
 
 Differentiating with respect to $\mathbf{x}$ gives the discrete state Jacobian
 
 $$
-F_d(\hat{\mathbf{x}}, i_s) = I + T_s\,F_c,\qquad F_c = \begin{bmatrix} 0 & 1 \\\\[6pt] \dfrac{2 K_m\,i_s^2}{m\,(x_0 - \hat{x}_1)^3} & 0 \end{bmatrix}
+F_d(\hat{\mathbf{x}}, i_s) = I + T_s  F_c,\qquad F_c = \begin{bmatrix} 0 & 1 \\\\[6pt] \dfrac{2 K_m  i_s^2}{m  (x_0 - \hat{x}_1)^3} & 0 \end{bmatrix}
 $$
 
 evaluated symbolically once in `design_EKF.m` and computed at runtime at each prediction step. The output Jacobian is the constant $H = [1\ \ 0]$ since only position is measured.
@@ -47,7 +47,7 @@ The EKF is realized as a subsystem containing a single MATLAB Function block (`e
 | `y` | noisy position measurement | input to the update step |
 | `p` | `ekf_params` parameter bus | $T_s, Q, R, H, P_0, \hat{\mathbf{x}}_0, K_m, m, g, x_0$ |
 
-Two further `1/z` delays close the recursion by feeding $\hat{\mathbf{x}}_{k-1}$ and $P_{k-1}$ back into the block. The unit delay on $u$ preserves the standard discrete time-step alignment: the prediction at step $k$ is computed from $u_{k-1}$, then corrected by $y_k$.
+Two further `1/z` delays close the recursion by feeding $$\hat{\mathbf{x}}_{k-1}$$ and $$P_{k-1}$$ back into the block. The unit delay on $u$ preserves the standard discrete time-step alignment: the prediction at step $k$ is computed from $u_{k-1}$, then corrected by $y_k$.
 
 **Why the input convention differs from the controllers.** The controller derivations in §4–§6 work with the squared current $u = i_s^2$ for control-affine algebra. The EKF, however, uses the *physical* current $i_s$ as its input because that is what the signal lines and the actual amplifier carry. The reconciliation is done at every controller's output stage: each controller computes its $u$, takes $i_s = \sqrt{\max(u,0)}$ (followed by the current limiter), and the resulting $i_s$ is what reaches both the plant and the EKF. Both conventions therefore describe the same physical signal, and the controllers, the plant, and the EKF stay perfectly consistent.
 

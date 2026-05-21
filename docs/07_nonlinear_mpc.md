@@ -1,6 +1,6 @@
 # 7. Nonlinear Model Predictive Control
 
-The controllers in §2–§6 share a common design philosophy: derive a closed-form control law (via linearization, exact cancellation, Lyapunov recursion, or sliding-mode reasoning) and tune its parameters offline. **Nonlinear Model Predictive Control (NMPC)** is a structurally different approach: at every sampling instant, solve a small constrained optimal-control problem over a finite prediction horizon, apply only the first input, and re-solve at the next instant. Constraints and trajectory shaping enter the design directly through the optimization rather than being retrofitted via saturation or anti-windup.
+The controllers in [§2](02_pid.md)–[§6](06_sliding_mode_control.md) share a common design philosophy: derive a closed-form control law (via linearization, exact cancellation, Lyapunov recursion, or sliding-mode reasoning) and tune its parameters offline. **Nonlinear Model Predictive Control (NMPC)** is a structurally different approach: at every sampling instant, solve a small constrained optimal-control problem over a finite prediction horizon, apply only the first input, and re-solve at the next instant. Constraints and trajectory shaping enter the design directly through the optimization rather than being retrofitted via saturation or anti-windup.
 
 NMPC is documented in its own chapter (rather than included in the [§10](10_results.md) comparison) because the standard formulation used here exhibits a residual steady-state error against the realistic Simscape plant, which would make a direct comparison against the integral-action controllers misleading. The natural remedy — offset-free MPC — is outside the current scope and discussed as future work.
 
@@ -11,7 +11,7 @@ The maglev plant has nonlinear dynamics, hard input constraints (amplifier curre
 At each sampling instant, the controller solves
 
 $$
-\min_{u_0, \ldots, u_{N-1}}\enspace \enspace  \sum_{k=0}^{N-1}\Big(\mathbf{x}_k^\top Q\,\mathbf{x}_k \enspace +\enspace  u_k^\top R\,u_k\Big) \enspace +\enspace  \mathbf{x}_N^\top Q_N\,\mathbf{x}_N
+\min_{u_0, \ldots, u_{N-1}}\;\; \sum_{k=0}^{N-1}\Big(\mathbf{x}_k^\top Q  \mathbf{x}_k \;+\; u_k^\top R  u_k\Big) \;+\; \mathbf{x}_N^\top Q_N  \mathbf{x}_N
 $$
 
 subject to
@@ -22,7 +22,7 @@ $$
 u_{\min} \leq u_k \leq u_{\max}
 $$
 
-where $\mathbf{x}_k = [x_1, x_2]^\top$ is the position-deviation/velocity state of §1.3, $u_k = i_s$ is the physical current command, $f_d$ is the discretized nonlinear plant, $Q, R, Q_N$ are the stage- and terminal-cost weight matrices, $N$ is the prediction horizon, and $u_{\min}, u_{\max}$ are the amplifier current bounds.
+where $$\mathbf{x}_k = [x_1, x_2]^\top$$ is the position-deviation/velocity state of §1.3, $$u_k = i_s$$ is the physical current command, $$f_d$$ is the discretized nonlinear plant, $$Q, R, Q_N$$ are the stage- and terminal-cost weight matrices, $$N$$ is the prediction horizon, and $$u_{\min}, u_{\max}$$ are the amplifier current bounds.
 
 The receding-horizon principle is standard: at each sample, solve the OCP, apply $u_0^\star$, then re-solve at the next sample with the updated initial state.
 
@@ -40,12 +40,12 @@ The numerical parameters (cost weights, horizon, sample time, constraint bounds)
 
 ## 7.4 Two Implementation Variants
 - **`Maglev_NMPC_AcadosSim.slx`** — uses acados's internal integrator (`acados_sim_solver`) as the simulation plant. Prediction model and plant model are *identical*: no model mismatch. The closed-loop state converges asymptotically to the origin.
-- **`Maglev_NMPC_Simscape.slx`** — uses the full Simscape Magnetic plant from folder `00_*`, with the same parametric uncertainties and external disturbances as the other controllers. Under this realistic mismatch, the closed-loop converges to a small **non-zero** steady-state offset.
+- **`Maglev_NMPC_Simscape.slx`** — uses the full Simscape Magnetic plant from folder `00_Shared_Library`, with the same parametric uncertainties and external disturbances as the other controllers. Under this realistic mismatch, the closed-loop converges to a small **non-zero** steady-state offset.
 
 The discrepancy between the two variants is exactly the plant–model mismatch that standard NMPC cannot absorb on its own.
 
 ## 7.5 Known Limitation and Recommended Extension
-Standard NMPC implicitly assumes the prediction model matches the plant. When it does (AcadosSim), tracking is exact. When it does not (Simscape, and any real hardware deployment), a residual offset remains. The closed-form controllers of §2–§6 carry an integral state that absorbs constant disturbances and steady model errors. NMPC needs an equivalent mechanism, and the standard remedy is **offset-free MPC**: augment the prediction model with a constant-disturbance state, estimate that state online with a Kalman filter on the augmented model, and feed it into both the cost and the constraint terms of the OCP.
+Standard NMPC implicitly assumes the prediction model matches the plant. When it does (AcadosSim), tracking is exact. When it does not (Simscape, and any real hardware deployment), a residual offset remains. The closed-form controllers of [§2](02_pid.md)–[§6](06_sliding_mode_control.md) carry an integral state that absorbs constant disturbances and steady model errors. NMPC needs an equivalent mechanism, and the standard remedy is **offset-free MPC**: augment the prediction model with a constant-disturbance state, estimate that state online with a Kalman filter on the augmented model, and feed it into both the cost and the constraint terms of the OCP.
 
 The implementation effort is non-trivial — re-deriving the OCP, redesigning the disturbance observer, and recompiling the S-functions — and is documented here as the **recommended next step** rather than included in the current scope.
 
