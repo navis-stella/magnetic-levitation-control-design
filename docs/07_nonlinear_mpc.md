@@ -10,15 +10,23 @@ The maglev plant has nonlinear dynamics, hard input constraints (amplifier curre
 
 ## 7.2 Problem Formulation
 At each sampling instant, the controller solves
+
 $$
+
 \min_{u_0, \ldots, u_{N-1}}\;\; \sum_{k=0}^{N-1}\Big(\mathbf{x}_k^\top Q\,\mathbf{x}_k \;+\; u_k^\top R\,u_k\Big) \;+\; \mathbf{x}_N^\top Q_N\,\mathbf{x}_N
+
 $$
+
 subject to
+
 $$
+
 \mathbf{x}_{k+1} = f_d(\mathbf{x}_k, u_k),\qquad
 \mathbf{x}_0 = \hat{\mathbf{x}}(t),\qquad
 u_{\min} \leq u_k \leq u_{\max}
+
 $$
+
 where $\mathbf{x}_k = [x_1, x_2]^\top$ is the position-deviation/velocity state of §1.3, $u_k = i_s$ is the physical current command, $f_d$ is the discretized nonlinear plant, $Q, R, Q_N$ are the stage- and terminal-cost weight matrices, $N$ is the prediction horizon, and $u_{\min}, u_{\max}$ are the amplifier current bounds.
 
 The receding-horizon principle is standard: at each sample, solve the OCP, apply $u_0^\star$, then re-solve at the next sample with the updated initial state.

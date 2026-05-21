@@ -97,13 +97,31 @@ The design pipeline `state_space_control_design.m`  executes in eight stages (S1
 An artificial symmetric allocation would *not* satisfy equilibrium because the center of mass (CoM) is offset; the optimization absorbs the asymmetry by construction.
 
 **S2 — Linearization of reluctance forces and moments.** For small deviations, each magnet's air-gap perturbation is
-$$\delta g_k = \mathbf{n}_k^\top \bigl(\delta\mathbf{p} + \delta\boldsymbol{\alpha} \times \mathbf{r}_k\bigr)$$
+
+$$
+
+\delta g_k = \mathbf{n}_k^\top \bigl(\delta\mathbf{p} + \delta\boldsymbol{\alpha} \times \mathbf{r}_k\bigr)
+
+$$
+
 where $\mathbf{n}_k$ is the magnet's surface-normal unit vector, $\mathbf{r}_k$ the lever arm from the sled geometric center to the magnet, $\delta\mathbf{p} = [dx, dy, 0]^\top$ the translational deviation, and $\delta\boldsymbol{\alpha} = [d\theta, d\phi, d\psi]^\top$ the rotational deviation. Symbolic differentiation of the net force and moment about the geometric center yields the stiffness Jacobians, evaluated at the equilibrium to give
-$$K_s \in \mathbb{R}^{5\times 5},\qquad K_i \in \mathbb{R}^{5\times 8}$$
+
+$$
+
+K_s \in \mathbb{R}^{5\times 5},\qquad K_i \in \mathbb{R}^{5\times 8}
+
+$$
+
 The $z$-translation row is dropped because that DOF is mechanically constrained.
 
 **S3 — Linearized state-space model.** The 10-dimensional state $\mathbf{x} = [\mathbf{q}; \dot{\mathbf{q}}]^\top$ and 8-dimensional input $\mathbf{u} = \mathbf{i}_\text{dev}$ assemble into
-$$\ddot{\mathbf{q}} = M^{-1}\bigl(K_s\,\mathbf{q} + K_i\,\mathbf{u}\bigr)$$
+
+$$
+
+\ddot{\mathbf{q}} = M^{-1}\bigl(K_s\,\mathbf{q} + K_i\,\mathbf{u}\bigr)
+
+$$
+
 The **mass-inertia matrix $M$ contains the off-diagonal terms** that arise from the CoM offset: a translational acceleration generates an angular impulse about the geometric center, and vice versa. These cross-terms are essential for closed-loop stability and would be missed by any decentralized design. Controllability is verified explicitly via the PBH test before the gain design proceeds.
 
 **S4 — Augmented LQR with anti-windup.** Following [§3](03_state_space_control.md), five integral states (one per controlled DOF) are appended, producing a 15-state augmented system. The LQR design uses block-diagonal weights, with *substantially larger* integrator weights on the rotational channels — necessary because angular deviations have a numerically smaller scale than translational deviations, and equal weighting would under-penalize them. The anti-windup gain $K_\text{aw}$ is computed as the pseudoinverse of the integral-state gain block, applying the back-calculation pattern of [§2](02_pid.md) generalized to the MIMO case.
@@ -111,7 +129,13 @@ The **mass-inertia matrix $M$ contains the off-diagonal terms** that arise from 
 **S5 — Sensor-to-DOF kinematic mapping.** The measurement model is the over-determined linear map $\mathbf{y} = H\,\mathbf{q}$, $H \in \mathbb{R}^{8 \times 5}$, where each row is the projection of position onto the corresponding magnet's local air-gap axis. The redundancy is a robustness benefit: a least-squares pseudoinverse $H^\dagger$ recovers the pose from any consistent measurement vector, with graceful degradation if a single sensor channel is corrupted.
 
 **S6 — Observer design (pole placement *or* Kalman filter).** The observer has the standard form
-$$\dot{\hat{\mathbf{x}}} = A\,\hat{\mathbf{x}} + B\,\mathbf{u} + L_\text{obs}\bigl(\mathbf{y} - C_\text{obs}\,\hat{\mathbf{x}}\bigr)$$
+
+$$
+
+\dot{\hat{\mathbf{x}}} = A\,\hat{\mathbf{x}} + B\,\mathbf{u} + L_\text{obs}\bigl(\mathbf{y} - C_\text{obs}\,\hat{\mathbf{x}}\bigr)
+
+$$
+
 and the script implements two designs selectable via a flag:
 
 - **Pole placement** — observer poles placed at a fixed multiple (≈6×) of the dominant controller poles. Deterministic, requires no noise model, useful for noise-free verification runs.
