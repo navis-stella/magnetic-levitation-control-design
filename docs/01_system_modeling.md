@@ -6,8 +6,8 @@ Single electromagnet attracting a ferromagnetic mass against gravity. The plant 
   <img src="sketchs/singleMaglev.png" width="480" alt="Single-magnet system schematic"/>
   <br><br>
   <em>Conceptual schematic of the single-magnet system: electromagnet at the top
-  with current i_s, ferromagnetic mass below with weight mg, air gap x_s between
-  them, and the position sensor reading y.</em>
+  with current i<sub>s</sub>, ferromagnetic mass below with weight mg, air gap x<sub>s</sub>
+  between them, and the position sensor reading y.</em>
 </p>
 
 ## 1.1 Reluctance Force
