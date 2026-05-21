@@ -22,15 +22,13 @@ $$
 u_{\min} \leq u_k \leq u_{\max}
 $$
 
-where $\mathbf{x}_k = [x_1, x_2]^\top$ is the position-velocity state,
-$u_k = i_s$ the current command, $f_d$ the discretized plant,
-$N$ the prediction horizon, and the input constraint is
-
-$$
-u_{\min} \leq u_k \leq u_{\max}
-$$
-
-$Q$, $R$, $Q_N$ are the stage- and terminal-cost weight matrices.
+where:
+- $\mathbf{x}_k = [x_1, x_2]^\top$ — position-velocity state
+- $u_k = i_s$ — physical current command
+- $f_d$ — discretized nonlinear plant
+- $N$ — prediction horizon
+- $u_{\min} \leq u_k \leq u_{\max}$ — input constraint
+- $Q$, $R$, $Q_N$ — stage- and terminal-cost weight matrices
 
 The receding-horizon principle is standard: at each sample, solve the OCP, apply $u_0^\star$, then re-solve at the next sample with the updated initial state.
 
