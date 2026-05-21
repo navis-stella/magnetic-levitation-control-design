@@ -29,7 +29,8 @@ The **geometric center of the sled** is the reference for all kinematic descript
 <div align="center">
   <img src="sketchs/sled_control_schematic.png" width="720" alt="Time Response"/>
 </div>
->**Figure** Top-level Simulink view showing the State-Space Controller with State Estimator subsystem on the upper right, the CAD-rendered plant subsystems (Machine Frame, Spindle Actuator & Sensor, Sled Tail Actuator & Sensor, Sled Unit) in the lower half, and the visualization panels (current values, air-gap measurements, sled state) on the left. Each subsystem will be annotated.
+
+> **Figure 13.1** Top-level Simulink view showing the State-Space Controller with State Estimator subsystem on the upper right, the CAD-rendered plant subsystems (Machine Frame, Spindle Actuator & Sensor, Sled Tail Actuator & Sensor, Sled Unit) in the lower half, and the visualization panels (current values, air-gap measurements, sled state) on the left. Each subsystem will be annotated.
 
 ## 13.2 CAD-Based Multibody Modeling
 
@@ -141,7 +142,7 @@ Both options share the same observer subsystem in the Simulink model; only $L_\t
 - *Pole analysis* of the open-loop plant (instability confirmed), the augmented closed loop, and the observer. Both closed-loop and observer pole sets are asserted strictly in the left half-plane; assertion failure halts the script before any unsafe gain is saved.
 - *Separation principle verification* — the eigenvalues of the full 25-state closed loop (10 plant + 10 observer + 5 integrator) are compared against the union of the standalone controller and observer eigenvalues. Agreement to numerical precision confirms the classical separation result.
 - *MIMO singular-value analysis* — open-loop $\sigma(L)$, sensitivity $S = (I + L)^{-1}$, complementary sensitivity $T$, and return difference $I + L$ are all plotted. Peak sensitivity $\|S\|_\infty$ is computed; the design target is $< 6$ dB.
-- *Sensitivity-based MIMO robustness margins* — from $\|S\|_\infty$, the script derives the *simultaneous* gain margin $\text{GM} = \|S\|_\infty / (\|S\|_\infty - 1)$ and phase margin $\text{PM} = 2\arcsin\bigl(1 / (2\|S\|_\infty)\bigr)$ guaranteed across all input–output channels — the MIMO replacement for per-channel SISO margins, which are not meaningful in a coupled system of this size.
+- *Sensitivity-based MIMO robustness margins* — from $$\|S\|_\infty$$, the script derives the *simultaneous* gain margin $$\text{GM} = \|S\|_\infty / (\|S\|_\infty - 1)$$ and phase margin $$\text{PM} = 2\arcsin\bigl(1 / (2\|S\|_\infty)\bigr)$$ guaranteed across all input–output channels — the MIMO replacement for per-channel SISO margins, which are not meaningful in a coupled system of this size.
 - *Step disturbance rejection* — a 1 N step is injected at the $y$-acceleration input through the full closed loop; the script confirms the integrator drives the steady-state position error to zero.
 
 This verification catches design errors at script time rather than at simulation time, and the assertions ensure that the parameters exported in S8 correspond to a guaranteed-stable design.
@@ -173,7 +174,8 @@ All translational and rotational deviations remained at negligible levels throug
 <div align="center">
   <img src="../04_Control_Design_SledUnit_Levitation/Results/sled_unit_pose_noise_on.png" width="720" alt="Sled unit pose"/>
 </div>
-> **Figure 13.1** — Sled unit pose trajectory (5-DOF) with measurement noise active.
+
+> **Figure 13.2** — Sled unit pose trajectory (5-DOF) with measurement noise active.
 
 | DOF | Peak Deviation | Settled By | Scale |
 |---|---|---|---|
@@ -190,7 +192,8 @@ Rotational coupling was effectively zero across all disturbance events. This con
 <div align="center">
   <img src="../04_Control_Design_SledUnit_Levitation/Results/airgap_profiles_noise_on.png" width="720" alt="Air-gap profiles"/>
 </div>
-> **Figure 13.2** — Air-gap profiles of all eight electromagnets with measurement noise active.
+
+> **Figure 13.3** — Air-gap profiles of all eight electromagnets with measurement noise active.
 
 **Startup transient.** The closed loop drives all eight air gaps from their initial values (asymmetric because of the rest pose) to the common 0.5 mm setpoint:
 

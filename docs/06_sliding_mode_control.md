@@ -14,7 +14,7 @@ $$
 On the surface ($s = 0$), $x_2 = -\lambda x_1$ and hence $\dot{x}_1 = -\lambda x_1$ — position converges exponentially with rate $\lambda$. The time derivative of the sliding variable is
 
 $$
-\dot{s} = \lambda  \dot{x}_1 + \dot{x}_2 = \lambda  x_2 + \left(-g + \frac{K_m}{m(x_0 - x_1)^2}  u\right)
+\dot{s} = \lambda  \dot{x}_1 + \dot{x}_2 = \lambda  x_2 + \left(-g + \frac{K_m}{m(x_0 - x_1)^2} \bullet u\right)
 $$
 
 > **Practical lower bound on $\lambda$.** Classical SMC theory only requires $\lambda > 0$ for sliding-mode stability. For this plant, however, the open-loop has an unstable real pole at $+\sqrt{2g/x_0} \approx 99$ rad/s. The closed-loop bandwidth set by the sliding dynamics must exceed this open-loop instability rate, so $\lambda$ must be chosen well above $\sqrt{2g/x_0}$. Values below this threshold fail to stabilize the plant regardless of how $\eta, K, \phi$ are tuned — a non-obvious failure mode if the sliding-surface design is taken in isolation from the open-loop dynamics.
@@ -36,7 +36,7 @@ $$
 A pure sign function produces chattering. Replacing it with a **saturation** of width $\phi$ smooths the switching:
 
 $$
-\theta(s) = \mathrm{sat}\left(\frac{s}{\phi}\right) = \begin{cases} \enspace \enspace \enspace 1 & s > \phi \\\\ \enspace \enspace \enspace s/\phi & |s| \leq \phi \\\\ -1 & s < -\phi \end{cases}
+\theta(s) = \mathrm{sat}\left(\frac{s}{\phi}\right) = \begin{cases} \enspace  1 & s > \phi \\\\ \enspace  s/\phi & |s| \leq \phi \\\\ -1 & s < -\phi \end{cases}
 $$
 
 Parameter roles:
@@ -47,7 +47,7 @@ Parameter roles:
 ## 6.4 Full Control Law
 
 $$
-u = \frac{m(x_0 - x_1)^2}{K_m}\left(g - \lambda  x_2 - \eta  \mathrm{sat}\left(\frac{s}{\phi}\right) - K  s\right)
+u = \frac{m(x_0 - x_1)^2}{K_m}\left(g - \lambda  x_2 - \eta \bullet \mathrm{sat}\left(\frac{s}{\phi}\right) - K  s\right)
 $$
 
 The physical current command (positive root with safe clamp):
@@ -86,13 +86,13 @@ $$
 where $\sigma$ is computed by an external Simulink integrator. Differentiating:
 
 $$
-\dot{s} = k_i  x_1 + \lambda  x_2 - g + \frac{K_m}{m(x_0 - x_1)^2}  u
+\dot{s} = k_i  x_1 + \lambda  x_2 - g + \frac{K_m}{m(x_0 - x_1)^2} \bullet u
 $$
 
 Imposing the same exponential reaching law as in §6.3:
 
 $$
-u = \frac{m(x_0 - x_1)^2}{K_m}  \Bigl(  g - k_i  x_1 - \lambda  x_2 - \eta  \mathrm{sat}\left(\tfrac{s}{\phi}\right) - K  s  \Bigr)
+u = \frac{m(x_0 - x_1)^2}{K_m}  \left(  g - k_i  x_1 - \lambda  x_2 - \eta \bullet \mathrm{sat}\left(\tfrac{s}{\phi}\right) - K  s  \right)
 $$
 
 **Sliding dynamics.** On $s = 0$, differentiation gives the homogeneous second-order ODE
