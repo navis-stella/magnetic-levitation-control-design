@@ -147,9 +147,9 @@ Both options share the same observer subsystem in the Simulink model; only $L_\t
 - *Separation principle verification* — the eigenvalues of the full 25-state closed loop (10 plant + 10 observer + 5 integrator) are compared against the union of the standalone controller and observer eigenvalues. Agreement to numerical precision confirms the classical separation result.
 - *MIMO singular-value analysis* — open-loop $\sigma(L)$, sensitivity $S = (I + L)^{-1}$, complementary sensitivity $T$, and return difference $I + L$ are all plotted. Peak sensitivity $\|S\|_\infty$ is computed; the design target is $< 6$ dB.
 - *Sensitivity-based MIMO robustness margins* — from the peak singular value
-  $\|S\|_\infty$, the script derives simultaneous margins across all channels:
-  - Gain margin: $\text{GM} = \|S\|_\infty / (\|S\|_\infty - 1)$
-  - Phase margin: $\text{PM} = 2\arcsin(1 / (2\|S\|_\infty))$
+  $\lVert S \rVert_\infty$, the script derives simultaneous margins across all channels:
+  - Gain margin: $\text{GM} = \lVert S \rVert_\infty / (\lVert S \rVert_\infty - 1)$
+  - Phase margin: $\text{PM} = 2\arcsin(1 / (2\lVert S \rVert_\infty))$
   These replace per-channel SISO margins, which are not meaningful in a coupled system of this size.
 - *Step disturbance rejection* — a 1 N step is injected at the $y$-acceleration input through the full closed loop; the script confirms the integrator drives the steady-state position error to zero.
 
@@ -224,7 +224,7 @@ Rotational coupling was effectively zero across all disturbance events. This con
 
 </div>
 
-The initial overshoot of $\approx 5\%$ is well within the accepted range for active magnetic bearing systems (typical threshold $\leq 10$–$15\%$) and originates primarily from the Simscape mechanical solver's transient at simulation start. The four magnets within each group (upper, lower) exhibit fully symmetrical responses, confirming uniform load distribution and geometric consistency of the model.
+The initial overshoot of $\approx 5\%$ is well within the accepted range for active magnetic bearing systems (typical threshold $\leq 10\text{–}15\%$) and originates primarily from the Simscape mechanical solver's transient at simulation start. The four magnets within each group (upper, lower) exhibit fully symmetrical responses, confirming uniform load distribution and geometric consistency of the model.
 
 **Steady-state performance.** After the startup transient:
 
@@ -260,7 +260,7 @@ Disturbance rejection is strong across all input channels. Even the 200 N·m tor
 | Performance criterion | Result | Assessment |
 |---|---|---|
 | Startup overshoot | $\approx 5\%$ | Acceptable |
-| Settling time | $\approx 0.40$–$0.45$ s | Good |
+| Settling time | $\approx 0.40\text{–}0.45 \text{ s}$ | Good |
 | Steady-state ripple | $\pm 1.0\%$ | Acceptable |
 | Disturbance rejection | $< 0.005$ mm deviation | Excellent |
 | DOF decoupling | rotations at noise floor | Excellent |
