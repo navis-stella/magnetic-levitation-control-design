@@ -41,11 +41,15 @@ The ratio $q_\mathrm{vel} / R$ is the practical aggressiveness handle — higher
 ## 8.4 Implementation in Simulink
 The EKF is realized as a subsystem containing a single MATLAB Function block (`ekf_maglev`) that performs the recursive predict/update steps. Three input ports feed the block each cycle:
 
+<div align="center">
+
 | Port | Source | Role |
 |---|---|---|
 | `u` | physical current $i_s$, delayed by $1/z$ | input to the prediction step |
 | `y` | noisy position measurement | input to the update step |
 | `p` | `ekf_params` parameter bus | $T_s, Q, R, H, P_0, \hat{\mathbf{x}}_0, K_m, m, g, x_0$ |
+
+</div>
 
 Two further `1/z` delays close the recursion by feeding $$\hat{\mathbf{x}}_{k-1}$$ and $$P_{k-1}$$ back into the block. The unit delay on $u$ preserves the standard discrete time-step alignment: the prediction at step $k$ is computed from $u_{k-1}$, then corrected by $y_k$.
 

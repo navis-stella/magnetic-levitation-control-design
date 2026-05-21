@@ -124,11 +124,13 @@ The five integral-action controllers were benchmarked on the single-magnet plant
 <div align="center">
   <img src="02_Control_Design_SingleMagnet_Levitation/Results/TimeResponse_Noise_active.png" width="720" alt="Time Response"/>
 </div>
+
 > **Figure** — Air-gap time response of PID, SSC, Backstepping, FBL+SSC, and SMC under identical step + disturbance test conditions.
 
 <div align="center">
   <img src="02_Control_Design_SingleMagnet_Levitation/Results/PerformanceCriteria_Noise_active.png" width="720" alt="Performance Criteria"/>
 </div>
+
 > **Figure** — Bar-chart comparison: overshoot, rise time, settling time, steady-state error.
 
 
