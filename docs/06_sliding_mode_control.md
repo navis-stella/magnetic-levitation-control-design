@@ -8,17 +8,13 @@ The same control-affine reformulation $u = i_s^2$ from [§5.1](05_feedback_linea
 Choose the sliding variable as a linear combination of position and velocity error:
 
 $$
-
 s(\mathbf{x}) = C^\top\mathbf{x} = \lambda\,x_1 + x_2,\qquad \lambda > 0
-
 $$
 
 On the surface ($s = 0$), $x_2 = -\lambda x_1$ and hence $\dot{x}_1 = -\lambda x_1$ — position converges exponentially with rate $\lambda$. The time derivative of the sliding variable is
 
 $$
-
 \dot{s} = \lambda\,\dot{x}_1 + \dot{x}_2 = \lambda\,x_2 + \left(-g + \frac{K_m}{m(x_0 - x_1)^2}\,u\right)
-
 $$
 
 > **Practical lower bound on $\lambda$.** Classical SMC theory only requires $\lambda > 0$ for sliding-mode stability. For this plant, however, the open-loop has an unstable real pole at $+\sqrt{2g/x_0} \approx 99$ rad/s. The closed-loop bandwidth set by the sliding dynamics must exceed this open-loop instability rate, so $\lambda$ must be chosen well above $\sqrt{2g/x_0}$. Values below this threshold fail to stabilize the plant regardless of how $\eta, K, \phi$ are tuned — a non-obvious failure mode if the sliding-surface design is taken in isolation from the open-loop dynamics.
@@ -27,26 +23,20 @@ $$
 Setting $\dot{s} = 0$ and solving for $u$ gives the equivalent control:
 
 $$
-
 u_{eq} = \frac{m(x_0 - x_1)^2}{K_m}\,(g - \lambda\,x_2)
-
 $$
 
 ## 6.3 Reaching Law (Exponential)
 The exponential reaching law combines a switching term with a proportional term:
 
 $$
-
 \dot{s} = -\eta\,\theta(s) - K\,s
-
 $$
 
 A pure sign function produces chattering. Replacing it with a **saturation** of width $\phi$ smooths the switching:
 
 $$
-
 \theta(s) = \mathrm{sat}\!\left(\frac{s}{\phi}\right) = \begin{cases} \;\;\;1 & s > \phi \\ \;\;\;s/\phi & |s| \leq \phi \\ -1 & s < -\phi \end{cases}
-
 $$
 
 Parameter roles:
@@ -57,17 +47,13 @@ Parameter roles:
 ## 6.4 Full Control Law
 
 $$
-
 u = \frac{m(x_0 - x_1)^2}{K_m}\left(g - \lambda\,x_2 - \eta\,\mathrm{sat}\!\left(\frac{s}{\phi}\right) - K\,s\right)
-
 $$
 
 The physical current command (positive root with safe clamp):
 
 $$
-
 i_s = \sqrt{\max(u, 0)}
-
 $$
 
 followed by the current limiter.
@@ -76,9 +62,7 @@ followed by the current limiter.
 With candidate $V = \tfrac{1}{2}s^2$, outside the boundary layer ($|s| > \phi$),
 
 $$
-
 \dot{V} = s\,\dot{s} = -\eta\,|s| - K\,s^2 \;\leq\; -\eta\,|s|
-
 $$
 
 guaranteeing finite-time reaching of the boundary layer.
@@ -96,33 +80,25 @@ In practice this residual offset is very small, thanks to SMC's intrinsic robust
 The standard surface of §6.1 is extended with an integral term, keeping $\lambda$ in its original role and adding a single integral gain $k_i$:
 
 $$
-
 s(\mathbf{x}, \sigma) = \lambda\,x_1 + x_2 + k_i\,\sigma,\qquad \dot{\sigma} = x_1
-
 $$
 
 where $\sigma$ is computed by an external Simulink integrator. Differentiating:
 
 $$
-
 \dot{s} = k_i\,x_1 + \lambda\,x_2 - g + \frac{K_m}{m(x_0 - x_1)^2}\,u
-
 $$
 
 Imposing the same exponential reaching law as in §6.3:
 
 $$
-
 u = \frac{m(x_0 - x_1)^2}{K_m}\,\Bigl(\,g - k_i\,x_1 - \lambda\,x_2 - \eta\,\mathrm{sat}\!\left(\tfrac{s}{\phi}\right) - K\,s\,\Bigr)
-
 $$
 
 **Sliding dynamics.** On $s = 0$, differentiation gives the homogeneous second-order ODE
 
 $$
-
 \ddot{x}_1 + \lambda\,\dot{x}_1 + k_i\,x_1 = 0
-
 $$
 
 with characteristic polynomial $p^2 + \lambda\,p + k_i = 0$. The two design parameters now play their familiar second-order roles: $\omega_n = \sqrt{k_i}$ and $\zeta = \lambda / (2\sqrt{k_i})$.

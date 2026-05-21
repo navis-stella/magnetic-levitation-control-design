@@ -8,9 +8,7 @@ Single electromagnet attracting a ferromagnetic mass against gravity. The plant 
 The attractive force of a single electromagnet acting on a ferromagnetic mass is
 
 $$
-
 F_R(x_s, i_s) = \frac{\mu_0 N^2 A}{2}\cdot\frac{i_s^2}{x_s^2} = K_M\,\frac{i_s^2}{x_s^2},\qquad K_M = \frac{\mu_0 N^2 A}{2}
-
 $$
 
 where $i_s$ is the coil current and $x_s$ the air gap.
@@ -19,18 +17,14 @@ where $i_s$ is the coil current and $x_s$ the air gap.
 Static levitation requires the reluctance force to balance gravity:
 
 $$
-
 K_M\,\frac{i_0^2}{x_0^2} = mg \quad\Longrightarrow\quad i_0 = \frac{x_0}{N}\sqrt{\frac{2mg}{\mu_0 A}}
-
 $$
 
 ## 1.3 Deviation Variables
 Define small-signal deviations from $(x_0, i_0)$:
 
 $$
-
 i = i_s - i_0,\qquad x = x_0 - x_s,\qquad f = F_R - F_g
-
 $$
 
 A positive $x$ corresponds to a *smaller* air gap and therefore a *larger* reluctance force. All position trajectories in this project are plotted in these deviation coordinates: the equilibrium air gap corresponds to $x = 0$, positive values indicate a smaller gap, negative values a larger one.
@@ -39,17 +33,13 @@ A positive $x$ corresponds to a *smaller* air gap and therefore a *larger* reluc
 A first-order Taylor expansion of $F_R - F_g$ about $(x_0, i_0)$ yields the linearized plant
 
 $$
-
 m\ddot{x} = k_x\,x + k_i\,i
-
 $$
 
 with the position- and current-stiffness coefficients
 
 $$
-
 k_x = 2K_M\,\frac{i_0^2}{x_0^3} = \frac{2mg}{x_0},\qquad k_i = 2K_M\,\frac{i_0}{x_0^2} = \frac{2mg}{i_0}
-
 $$
 
 Both $k_x, k_i > 0$, so the open-loop plant has an unstable real pole at $s = +\sqrt{k_x/m} = \sqrt{2g/x_0} \approx 99\,\text{rad/s}$. Active feedback is therefore not a design choice but a stability prerequisite.

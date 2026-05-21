@@ -8,9 +8,7 @@ The EKF is designed in `Controller_Design/design_EKF.m`, the parameters are save
 The EKF uses the **physical current $i_s$** as the input — not the squared current $u = i_s^2$ used in the controller derivations of [§4](04_backstepping.md)–[§6](06_sliding_mode_control.md) for control-affine convenience. The continuous-time model is therefore
 
 $$
-
 \dot{x}_1 = x_2,\qquad \dot{x}_2 = \frac{K_m}{m}\cdot\frac{i_s^2}{(x_0 - x_1)^2} - g
-
 $$
 
 with output $y = x_1 + n$, where $n$ is zero-mean Gaussian measurement noise from the eddy-current gap sensor.
@@ -19,17 +17,13 @@ with output $y = x_1 + n$, where $n$ is zero-mean Gaussian measurement noise fro
 The model is discretized by **Euler-forward** at $T_s = 100\,\mu\text{s}$ (10 kHz), roughly ten times faster than the dominant closed-loop dynamics:
 
 $$
-
 \mathbf{x}_{k+1} = \mathbf{x}_k + T_s\,f(\mathbf{x}_k, i_{s,k})
-
 $$
 
 Differentiating with respect to $\mathbf{x}$ gives the discrete state Jacobian
 
 $$
-
 F_d(\hat{\mathbf{x}}, i_s) = I + T_s\,F_c,\qquad F_c = \begin{bmatrix} 0 & 1 \\[6pt] \dfrac{2 K_m\,i_s^2}{m\,(x_0 - \hat{x}_1)^3} & 0 \end{bmatrix}
-
 $$
 
 evaluated symbolically once in `design_EKF.m` and computed at runtime at each prediction step. The output Jacobian is the constant $H = [1\ \ 0]$ since only position is measured.

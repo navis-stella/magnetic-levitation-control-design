@@ -7,9 +7,7 @@ The single-magnet system of [§1](01_system_modeling.md)–[§11](11_comparative
 Two electromagnets are arranged symmetrically above and below the mobile sled, each paired with its own ferromagnetic armature. The upper magnet pulls the sled upward, the lower magnet pulls it downward, and gravity acts downward. The 1-D vertical equilibrium condition is
 
 $$
-
 F_{m,\text{up}} = F_{m,\text{lw}} + F_g
-
 $$
 
 There is no rotational moment to consider. The controller drives the sled to a state in which the two air gaps are equal by default, but the design script accepts independent target values for the upper and lower gaps if asymmetric operation is desired.
@@ -66,9 +64,7 @@ The controller is a state-space controller with integral action — the same des
 **Step 1 — Equilibrium currents via constrained optimization.** The force-balance equation
 
 $$
-
 K_m\,\frac{i_{\text{up}}^2}{x_{\text{up},0}^2} \;-\; K_m\,\frac{i_{\text{lw}}^2}{x_{\text{lw},0}^2} \;=\; m\,g
-
 $$
 
 admits a one-parameter family of solutions in the $(i_{\text{up}}, i_{\text{lw}})$ plane. The selected pair $(i_{\text{up},0}, i_{\text{lw},0})$ is the one that minimizes total electrical power $i_{\text{up}}^2 + i_{\text{lw}}^2$ subject to the equilibrium constraint and the amplifier current bounds, solved numerically with `fmincon`.
@@ -76,9 +72,7 @@ admits a one-parameter family of solutions in the $(i_{\text{up}}, i_{\text{lw}}
 **Step 2 — Differential drive and linearization.** The two physical currents are parameterized by a single scalar deviation:
 
 $$
-
 i_{\text{up}} = i_{\text{up},0} + i_{\text{dev}},\qquad i_{\text{lw}} = i_{\text{lw},0} - i_{\text{dev}}
-
 $$
 
 A positive $i_{\text{dev}}$ produces a net upward force by simultaneously increasing the upper current and decreasing the lower current. This **collapses the two physical inputs into a single control variable**, making the plant SISO and matching the structure of [§3](03_state_space_control.md) exactly.
@@ -86,17 +80,13 @@ A positive $i_{\text{dev}}$ produces a net upward force by simultaneously increa
 The sled is rigid, so a position deviation $x$ (positive upward) makes the upper gap smaller by $x$ and the lower gap larger by $x$. Substituting and taking the first-order Taylor expansion yields
 
 $$
-
 m\,\ddot{x} = k_x\,x + k_i\,i_{\text{dev}}
-
 $$
 
 with the dual-magnet stiffness coefficients
 
 $$
-
 k_x = 2 K_m\!\left(\frac{i_{\text{up},0}^2}{x_{\text{up},0}^3} + \frac{i_{\text{lw},0}^2}{x_{\text{lw},0}^3}\right),\qquad k_i = 2 K_m\!\left(\frac{i_{\text{up},0}}{x_{\text{up},0}^2} + \frac{i_{\text{lw},0}}{x_{\text{lw},0}^2}\right)
-
 $$
 
 Both coefficients are strictly positive — each magnet pair contributes additively, so the open-loop plant remains unstable, exactly as in [§1.4](01_system_modeling.md). **Sanity check**: setting $i_{\text{lw},0} = 0$ reduces these expressions to $k_x = 2mg/x_{\text{up},0}$ and $k_i = 2mg/i_{\text{up},0}$, recovering the single-magnet linearization identically.
@@ -104,9 +94,7 @@ Both coefficients are strictly positive — each magnet pair contributes additiv
 **Step 3 — Augmented state-space controller.** Following [§3](03_state_space_control.md), the integral of position is added as a state:
 
 $$
-
 \mathbf{z} = [x, v, q]^\top,\qquad \dot{\mathbf{z}} = A_{\text{aug}}\,\mathbf{z} + B_{\text{aug}}\,i_{\text{dev}}
-
 $$
 
 The feedback gain $K$ is computed by pole placement or LQR exactly as in [§3](03_state_space_control.md). The controller outputs the virtual input $i_{\text{dev}}$, which is mapped back to physical current commands $(i_{\text{up}}, i_{\text{lw}})$ via the differential-drive relation of Step 2.

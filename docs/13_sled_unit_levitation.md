@@ -1,4 +1,3 @@
-
 # 13. Sled Unit Levitation
 
 This is the most complex system in the project: a multi-DOF magnetically levitated sled unit. It serves two purposes simultaneously — to deliver a working controller for an industrially-realistic geometry, and to validate the design recommendation of [§11.3](11_comparative_analysis.md) (state-space control as the practical default for multi-DOF magnetic bearing systems) on a system whose scale would make any of the nonlinear analytical methods prohibitive.
@@ -99,17 +98,13 @@ An artificial symmetric allocation would *not* satisfy equilibrium because the c
 **S2 — Linearization of reluctance forces and moments.** For small deviations, each magnet's air-gap perturbation is
 
 $$
-
 \delta g_k = \mathbf{n}_k^\top \bigl(\delta\mathbf{p} + \delta\boldsymbol{\alpha} \times \mathbf{r}_k\bigr)
-
 $$
 
 where $\mathbf{n}_k$ is the magnet's surface-normal unit vector, $\mathbf{r}_k$ the lever arm from the sled geometric center to the magnet, $\delta\mathbf{p} = [dx, dy, 0]^\top$ the translational deviation, and $\delta\boldsymbol{\alpha} = [d\theta, d\phi, d\psi]^\top$ the rotational deviation. Symbolic differentiation of the net force and moment about the geometric center yields the stiffness Jacobians, evaluated at the equilibrium to give
 
 $$
-
 K_s \in \mathbb{R}^{5\times 5},\qquad K_i \in \mathbb{R}^{5\times 8}
-
 $$
 
 The $z$-translation row is dropped because that DOF is mechanically constrained.
@@ -117,9 +112,7 @@ The $z$-translation row is dropped because that DOF is mechanically constrained.
 **S3 — Linearized state-space model.** The 10-dimensional state $\mathbf{x} = [\mathbf{q}; \dot{\mathbf{q}}]^\top$ and 8-dimensional input $\mathbf{u} = \mathbf{i}_\text{dev}$ assemble into
 
 $$
-
 \ddot{\mathbf{q}} = M^{-1}\bigl(K_s\,\mathbf{q} + K_i\,\mathbf{u}\bigr)
-
 $$
 
 The **mass-inertia matrix $M$ contains the off-diagonal terms** that arise from the CoM offset: a translational acceleration generates an angular impulse about the geometric center, and vice versa. These cross-terms are essential for closed-loop stability and would be missed by any decentralized design. Controllability is verified explicitly via the PBH test before the gain design proceeds.
@@ -131,9 +124,7 @@ The **mass-inertia matrix $M$ contains the off-diagonal terms** that arise from 
 **S6 — Observer design (pole placement *or* Kalman filter).** The observer has the standard form
 
 $$
-
 \dot{\hat{\mathbf{x}}} = A\,\hat{\mathbf{x}} + B\,\mathbf{u} + L_\text{obs}\bigl(\mathbf{y} - C_\text{obs}\,\hat{\mathbf{x}}\bigr)
-
 $$
 
 and the script implements two designs selectable via a flag:
