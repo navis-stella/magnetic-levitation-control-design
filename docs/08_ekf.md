@@ -51,7 +51,7 @@ The EKF is realized as a subsystem containing a single MATLAB Function block (`e
 
 </div>
 
-Two further `1/z` delays close the recursion by feeding x̂<sub>k−1</sub> and P<sub>k−1</sub> back into the block. The unit delay on $u$ preserves the standard discrete time-step alignment: the prediction at step $k$ is computed from $u_{k-1}$, then corrected by $y_k$.
+Two further `1/z` delays close the recursion by feeding $x̂<sub>k−1</sub>$ and $P<sub>k−1</sub>$ back into the block. The unit delay on $u$ preserves the standard discrete time-step alignment: the prediction at step $k$ is computed from $u_{k-1}$, then corrected by $y_k$.
 
 **Why the input convention differs from the controllers.** The controller derivations in [§4](04_backstepping.md)–[§6](06_sliding_mode_control.md) work with the squared current $u = i_s^2$ for control-affine algebra. The EKF, however, uses the *physical* current $i_s$ as its input because that is what the signal lines and the actual amplifier carry. The reconciliation is done at every controller's output stage: each controller computes its $u$, takes $i_s = \sqrt{\max(u,0)}$ (followed by the current limiter), and the resulting $i_s$ is what reaches both the plant and the EKF. Both conventions therefore describe the same physical signal, and the controllers, the plant, and the EKF stay perfectly consistent.
 
