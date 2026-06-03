@@ -4,7 +4,7 @@
 %  PROJECT   : Single Magnet Levitation System (Magnetic Levitation)
 %  CONTENT   : Design and parameterization of nonlinear controllers
 %
-%  CONTROLLERS: 1) Feedback Linearization + State-Space Control (FBL+SSC)
+%  CONTROLLERS: 1) Feedback Linearization + PID/State-Space Control
 %               2) Integrator Backstepping with Integral Component
 %               3) Sliding Mode Control (SMC) with Integral Sliding Surface
 %
@@ -15,7 +15,7 @@
 %  DEPENDENT : setup_sim_params.m        — System parameters (mass, Km, grav, ...)
 %
 %  OUTPUT    : NonlinearControllerData.mat
-%              Contains: Plant, fblssc, bksp, smc, smc_Bus
+%              Contains: Plant, fbklin, bksp, smc, smc_Bus
 %
 % #########################################################################
 %
@@ -58,10 +58,11 @@ end
 %% --- Plant Parameters ---
 Plant.ag_eq = airgap_soll;   % Target air gap [mm], passed to Simulink model
 Plant.kinM  =  [1, -1];      % Kinematic mapping matrix
+Plant.x_init = [(airgap_soll-airgap_init)*1e-3; 0]; % Initial state
 
 
 % #########################################################################
-%% === CONTROLLER 1: Feedback Linearization + State-Space Control (FBL+SSC) ===
+%% === CONTROLLER 1: Feedback Linearization + State-Space Control ===
 % #########################################################################
 %
 %  BASIC IDEA:
@@ -104,9 +105,9 @@ B_fbl = [0; 0; 1];
 %  Coefficient comparison: kd = 210, kp = 20800, ki = 640000
 %  (Negative signs since feedback: v = -K * z)
 
-fblssc.kd = -210;       % D-gain: Coefficient of s^2 (damping)          [1/s]
-fblssc.kp = -20800;     % P-gain: Coefficient of s^1 (stiffness)        [1/s^2]
-fblssc.ki = -640000;    % I-gain: Coefficient of s^0 (stat. accuracy)   [1/s^3]
+fbklin.kd = -210;       % D-gain: Coefficient of s^2 (damping)          [1/s]
+fbklin.kp = -20800;     % P-gain: Coefficient of s^1 (stiffness)        [1/s^2]
+fbklin.ki = -640000;    % I-gain: Coefficient of s^0 (stat. accuracy)   [1/s^3]
 
 % -------------------------------------------------------------------------
 %% --- 1.2 Pole Placement ---
@@ -122,7 +123,7 @@ fblssc.ki = -640000;    % I-gain: Coefficient of s^0 (stat. accuracy)   [1/s^3]
 
 s_p      = [-30, -70, -160];
 K_pole   = place(A_fbl, B_fbl, s_p);
-fblssc.K_pole = K_pole;   % State feedback vector (Pole Placement)   [1×3]
+fbklin.K_pole = K_pole;   % State feedback vector (Pole Placement)   [1×3]
 
 % -------------------------------------------------------------------------
 %% --- 1.3 Linear-Quadratic Regulator (LQR) ---
@@ -141,7 +142,7 @@ fblssc.K_pole = K_pole;   % State feedback vector (Pole Placement)   [1×3]
 Q_fbl        = diag([4e11, 5e7, 5e4]);
 R_fbl        = 1;
 [K_lqr, S, P] = lqr(A_fbl, B_fbl, Q_fbl, R_fbl);
-fblssc.K_lqr = K_lqr;    % State feedback vector (LQR optimization)  [1×3]
+fbklin.K_lqr = K_lqr;    % State feedback vector (LQR optimization)  [1×3]
 
 % #########################################################################
 %% === CONTROLLER 2: Integrator Backstepping with Integral Component ===
@@ -235,31 +236,20 @@ u0 = i0^2;                          % Equilibrium control input u0     [A^2]
 %     x1_dot + lambda * x1 = 0   =>   x1(t) = x1(0) * exp(-lambda * t)
 %   Stability condition (necessary):
 %     lambda > |unstable pole| = sqrt(2*g / x0) ≈ 99 rad/s
-%   Choice: lambda = 120 rad/s  (Stability margin: +21 %)
-smc.lambda = 120;                    % Sliding surface coefficient      [rad/s]
+smc.lambda = 150;                    % Sliding surface coefficient      [rad/s]
 
 % Exponential reaching gain K
 %   Controls the convergence rate to the sliding surface during reaching phase:
 %     s_dot = -K * s   =>   s(t) = s(0) * exp(-K * t)
 %   Higher K: faster reaching, higher noise sensitivity.
-%   Rule of thumb: K_start = lambda / 4 to lambda / 2
-smc.K = 30;                          % Exponential reaching gain        [-]
-
-% Integral sliding surface component ki
-%   Extends the sliding surface by: + ki * integral(x1 dt)
-%   Purpose (two aspects):
-%     1. Eliminating steady-state offsets due to EKF estimation lag
-%     2. Compensating for constant disturbances not modeled in EKF
-%   Too high ki: Integrator windup → Overshoot.
-%   Anti-Windup: Freeze integrator once i_cmd saturates (|i| = i_max).
-smc.ki = 5000;                       % Integral sliding surface gain    [1/s]
+smc.K = 50;                          % Exponential reaching gain        [-]
 
 % Switching gain eta
 %   Ensures reaching condition s * s_dot < 0 despite disturbances:
 %     eta > || d(x,t) ||_max   (upper disturbance bound in s-space)
 %   Scaling with u0 adjusts eta physically to the control input range.
 %   Too high eta: increased chattering (remedy: increase phi).
-smc.eta = 10 * u0;                   % Switching gain                   [A^2]
+smc.eta = 3;                   % Switching gain                   [A^2]
 
 % Boundary layer thickness phi
 %   Replaces sign(s) with the continuous saturation function sat(s/phi):
@@ -273,7 +263,16 @@ smc.eta = 10 * u0;                   % Switching gain                   [A^2]
 %                  → steady-state error (without ki compensation)
 %   Unit of phi matches unit of s [m/s]:
 %     s = lambda [rad/s] * x1 [m] + x2 [m/s] → [m/s]
-smc.phi = 0.003;                     % Boundary layer thickness         [m/s]
+smc.phi = 0.02;                     % Boundary layer thickness         [m/s]
+
+% Integral sliding surface component ki
+%   Extends the sliding surface by: + ki * integral(x1 dt)
+%   Purpose (two aspects):
+%     1. Eliminating steady-state offsets due to EKF estimation lag
+%     2. Compensating for constant disturbances not modeled in EKF
+%   Too high ki: Integrator windup → Overshoot.
+%   Anti-Windup: Freeze integrator once i_cmd saturates (|i| = i_max).
+smc.ki = 5000;                       % Integral sliding surface gain    [1/s]
 
 % Sliding vector C
 %   Defines the sliding surface in compact vector form:
@@ -296,9 +295,9 @@ elems = {
     'x0',     1;       % Target air gap                           [m]
     'lambda', 1;       % Sliding surface coefficient              [rad/s]
     'K',      1;       % Exponential reaching gain                [-]
-    'ki',     1;       % Integral sliding surface gain            [1/s]
     'eta',    1;       % Switching gain                           [A^2]
     'phi',    1;       % Boundary layer thickness                 [m/s]
+    'ki',     1;       % Integral sliding surface gain            [1/s]
     'C',      [2 1];   % Sliding vector                           [2×1]
 };
 
@@ -319,7 +318,7 @@ end
 %  All structures are saved in a common .mat file and are available 
 %  to all Simulink models via the Workspace.
 save('../Controller_Params/NonlinearControllerData.mat', ...
-     'Plant', 'fblssc', 'bksp', 'smc', 'smc_Bus');
+     'Plant', 'fbklin', 'bksp', 'smc', 'smc_Bus');
 
 % cd ..\02_Nonlinear_Controller_Analytical\
 
@@ -328,5 +327,5 @@ fprintf('\n%s\n', repmat('=', 1, 80));
 fprintf('  Nonlinear controller design completed successfully.\n');
 fprintf('  Timestamp : %s\n', datetime('now', 'Format', 'dd.MM.yyyy HH:mm:ss'));
 fprintf('  Output    : Controller_Params/NonlinearControllerData.mat\n');
-fprintf('  Controllers: FBL+SSC  |  Backstepping  |  SMC\n');
+fprintf('  Controllers: FeedbackLin  |  Backstepping  |  SMC\n');
 fprintf('%s\n\n', repmat('=', 1, 80));

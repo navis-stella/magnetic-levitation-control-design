@@ -11,7 +11,7 @@
 % #########################################################################
 
 %% --- Environment Check ---
-if ~exist('AirGapUpper_soll', 'var') || ~exist('SledMass', 'var')
+if ~exist('AirGapUpper_soll', 'var') || ~exist('SlideMass', 'var')
     fprintf('>> [INFO]: Base parameters missing. Running setup script...\n');
     run('setup_dualMaglev_system.m'); 
 end
@@ -37,7 +37,7 @@ objFun = @(i) i(1)^2 + i(2)^2;
 
 % Nonlinear constraint: F_net - F_gravity = 0
 % F_net = F_upper - F_lower
-nonlcon = @(i) deal([], Km*(i(1)^2 / x_up0^2) - Km*(i(2)^2 / x_lw0^2) - SledMass*grav);
+nonlcon = @(i) deal([], Km*(i(1)^2 / x_up0^2) - Km*(i(2)^2 / x_lw0^2) - SlideMass*grav);
 
 % Boundary conditions [i_upper; i_lower]
 lb = [minCurrent; minCurrent]; % Avoiding unstable regions for i -> 0
@@ -47,7 +47,7 @@ ub = [I_max; I_max];
 % Calculate a plausible bias current to accelerate convergence
 a_coeff = Km / x_up0^2;
 b_coeff = Km / x_lw0^2;
-gravity = SledMass * grav;
+gravity = SlideMass * grav;
 
 % Adaptive Bias Current (works for both symmetric and asymmetric cases)
 i_bias_approx = sqrt(gravity / (4 * min(a_coeff, b_coeff))) + minCurrent + 0.5; % +0.5 A safety margin
@@ -113,9 +113,9 @@ fprintf('>> [INFO]: Linearization complete.\n   kx = %.2f N/m, ki = %.2f N/A\n',
 %% 4. State-Space Controller Design (SSC)
 % Augmented system [Position; Velocity; Integral Error]
 A_aug = [0, 1, 0; ...
-         kx / SledMass, 0, 0; ...
+         kx / SlideMass, 0, 0; ...
          1, 0, 0];
-B_aug = [0; ki / SledMass; 0];
+B_aug = [0; ki / SlideMass; 0];
 C_aug = [1, 0, 0];
 
 % Check controllability

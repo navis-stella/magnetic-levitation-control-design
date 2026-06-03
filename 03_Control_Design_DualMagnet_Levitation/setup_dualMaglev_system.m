@@ -21,15 +21,15 @@ end
 %% 1. Global Simulation Parameters
 T_sim    = 2;              % Simulation duration [s]
 grav     = 9.80665;        % Gravitational acceleration [m/s^2]
-SledMass = 50;             % Total mass of the levitation unit [kg]
+SlideMass = 50;            % Total mass of the levitation unit [kg]
 
 % --- System limits (Constraints) ---
 I_min = 0;                 % Minimum coil current [A]
 I_max = 15;                % Maximum coil current [A]
 
 % --- External Load ---
-T_step = 0.5 * T_sim;           % Step time [s]
-FinVal = 0.5 * SledMass * grav; % Final force value [N]
+T_step = 0.5 * T_sim;            % Step time [s]
+FinVal = 0.5 * SlideMass * grav; % Final force value [N]
 
 %% 2. Kinematic Parameters for Multibody Simulation (MBS)
 % Definition of geometry and initial positions for Simscape Multibody.
@@ -43,7 +43,7 @@ AirGapUpper_init = 4;       % Upper side [mm]
 AirGapLower_init = 0;       % Lower side [mm]
 
 % --- Setpoints for operating point ---
-% IMPORTANT: If the target air gap or sled mass is changed, the controller 
+% IMPORTANT: If the target air gap or Slide mass is changed, the controller 
 % design must be re-executed to guarantee performance.
 % See: "design_state_space_control.m"
 AirGapUpper_soll = 2;  % Desired static air gap at the top [mm]
@@ -52,7 +52,7 @@ AirGapLower_soll = PJ_max_route - AirGapUpper_soll;
 % --- Dimensions (Length, Width, Height) [mm] ---
 elMagnetSize = ElectromagnetConfig.MagnetSize;
 ArmatureSize = [300 250  80];                   % Armature (solid & homogeneous)
-SledUnitSize = [250 200 150];                   % Movable sled unit
+SlideUnitSize = [250 200 150];                  % Movable Slide unit
 
 % --- Material properties ---
 ArmaturDensity = 1000000;       % Density [kg/m^3]
@@ -64,18 +64,18 @@ ArmaturDensity = 1000000;       % Density [kg/m^3]
 % Lower armature plate (fixed)
 lwArmaGS2WD = [0, 0, ArmatureSize(3)/2];   
 
-% Sled (movable) - Initial position
-SdMGS2WD    = [0, 0, ArmatureSize(3) + elMagnetSize(3) + AirGapLower_init + SledUnitSize(3)/2];
+% Slide (movable) - Initial position
+SdMGS2WD    = [0, 0, ArmatureSize(3) + elMagnetSize(3) + AirGapLower_init + SlideUnitSize(3)/2];
 
 % Upper armature plate (fixed)
-upArmaGS2WD = [0, 0, SdMGS2WD(3) + SledUnitSize(3)/2 + elMagnetSize(3) + AirGapUpper_init + ArmatureSize(3)/2];
+upArmaGS2WD = [0, 0, SdMGS2WD(3) + SlideUnitSize(3)/2 + elMagnetSize(3) + AirGapUpper_init + ArmatureSize(3)/2];
 
 % --- Positions relative to the Prismatic Joint (PJ) ---
-lwMagGS2PJ  = [0, 0, -(SledUnitSize(3) + elMagnetSize(3))/2];
-upMagGS2PJ  = [0, 0,  (SledUnitSize(3) + elMagnetSize(3))/2]; 
+lwMagGS2PJ  = [0, 0, -(SlideUnitSize(3) + elMagnetSize(3))/2];
+upMagGS2PJ  = [0, 0,  (SlideUnitSize(3) + elMagnetSize(3))/2]; 
 
 % Initial state for the simulation
-SledPOS_init = SdMGS2WD(3);
+SlidePOS_init = SdMGS2WD(3);
 
 %% 2.2 Contact Surface Reference Frames (Force Application Points)
 % Convention:
@@ -107,7 +107,7 @@ euler_x180     = [0, 180, 0];   % 180° around X (corresponds in ZYX: first [0,0
 % Axis: [1 0 0], Angle: 180 deg  ← simplest parameterization
 
 % --- Kinematic Mapping --- 
-% Determination of unit sled motion relative to the local air gap.
+% Determination of unit Slide motion relative to the local air gap.
 % Measurement in the local frame relative to the world frame.
 % x_dev_up = airgap_eq_up - airgap_meas_up;
 % x_dev_lw = airgap_eq_lw - airgap_meas_lw;

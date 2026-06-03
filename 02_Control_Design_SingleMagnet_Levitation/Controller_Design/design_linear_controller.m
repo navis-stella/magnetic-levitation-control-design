@@ -35,8 +35,8 @@
 %    ki = 2 * Km * i_eq  / x_eq^2                         > 0  (input gain)
 %
 %    State-Space Model (deviation coordinates):
-%      A = [0       1   ]     B = [0      ]
-%          [kx/m    0   ]         [ki/m]
+%      A = [0       1   ]     B = [0    ]
+%          [kx/m    0   ]         [ki/m ]
 %      C = [1  0],  D = 0
 %
 %  NOTE: The system has an unstable pole at s = +sqrt(kx/m) ≈ +99 rad/s.
@@ -132,7 +132,7 @@ Plant.i_eq  = i_eq;          % Equilibrium current    [A]
 Plant.ag_eq = airgap_soll;   % Target air gap         [mm]
 Plant.mass  = mass;          % Mass                   [kg]
 Plant.kinM  = [1, -1];       % Kinematic mapping matrix
-
+Plant.x_init = [(airgap_soll-airgap_init)*1e-3; 0]; % Initial state
 
 % #########################################################################
 %% === CONTROLLER 1 & 2: PD Controllers ===
@@ -270,17 +270,14 @@ K_aug   = place(A_aug, B_aug, s_poles);  % State feedback vector [1×3]
 %
 %  Weighting matrices Q and R (Tuning parameters):
 %    Q = diag([q_pos, q_vel, q_int])
-%      q_pos = 1e-6   — very low weighting on position error
-%      q_vel = 10000  — high weighting on velocity (high damping)
-%      q_int = 2      — moderate weighting on integral error
-%    R = 2e-6          — low control effort penalty
+%    R        
 %
 %  Return values:
 %    K_lqr : optimal feedback matrix
 %    S_lqr : solution of Algebraic Riccati Equation
 %    P_lqr : eigenvalues of optimal system dynamics
 
-Q_lqr = diag([1e-6, 10000, 2]);          % State weighting        [3×3]
+Q_lqr = diag([2, 1e-6, 10000]);          % State weighting        [3×3]
 R_lqr = 2e-6;                            % Control weighting      [-]
 [K_lqr, S_lqr, P_lqr] = lqr(A_aug, B_aug, Q_lqr, R_lqr);
 

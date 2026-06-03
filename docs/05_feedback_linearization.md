@@ -78,10 +78,10 @@ $$
 
 the closed-loop characteristic polynomial is $s^3 + k_d s^2 + k_p s + k_i = 0$.
 
-**Option B — State-space controller with integral action (implemented).** Augmenting the linearized double integrator with the integral state $q = \int x  dt$ yields the same triple $\mathbf{z} = [x, v, q]^\top$ as in [§3](03_state_space_control.md), but with system matrix
+**Option B — State-space controller with integral action (implemented).** Augmenting the linearized double integrator with the integral state $q = \int x  dt$ yields the same triple $\mathbf{z} = [q, x, v]^\top$ as in [§3](03_state_space_control.md), but with system matrix
 
 $$
-A_{\text{FBL}} = \begin{bmatrix} 0 & 1 & 0 \\\\ 0 & 0 & 0 \\\\ 1 & 0 & 0 \end{bmatrix},\qquad B_{\text{FBL}} = \begin{bmatrix} 0 \\\\ 1 \\\\ 0 \end{bmatrix}
+A_{\text{FBL}} = \begin{bmatrix} 0 & 1 & 0 \\\\ 0 & 0 & 1 \\\\ 0 & 0 & 0 \end{bmatrix},\qquad B_{\text{FBL}} = \begin{bmatrix} 0 \\\\ 0 \\\\ 1 \end{bmatrix}
 $$
 
 The crucial difference from [§3](03_state_space_control.md): $A_{\text{FBL}}$ contains no stiffness terms $k_x/m$, because the nonlinearity has been cancelled exactly. The feedback gain $K$ for $v = -K\mathbf{z}$ is obtained by pole placement or LQR on $(A_{\text{FBL}}, B_{\text{FBL}})$, and the resulting design is **independent of the operating-point gap** — the same gain works at any equilibrium where the model holds.

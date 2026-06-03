@@ -57,7 +57,10 @@ dyn_model.f_impl_expr = f_impl_expr;
 
 %% OCP Formulation (Optimal Control Problem)
 % Load MPC parameters from external configuration file
+genFlag = true;
 setup_nmpc_params;
+clearvars genFlag;
+
 Ts = nmpc.Ts;  % Sampling time [s]
 N  = nmpc.N;   % Prediction horizon length [steps]
 
@@ -75,9 +78,9 @@ nu = length(ocp.model.u);  % Number of control inputs
 % --- Cost Function ---
 % Initial cost term (Time step t = 0)
 ocp.cost.cost_type_0          = 'NONLINEAR_LS';
-ocp.cost.W_0                  = blkdiag(W_x, W_u);
-ocp.cost.yref_0               = zeros(nx+nu, 1);
-ocp.model.cost_y_expr_0       = vertcat(dyn_model.x, dyn_model.u);
+ocp.cost.W_0                  = W_x;
+ocp.cost.yref_0               = zeros(nx, 1);
+ocp.model.cost_y_expr_0       = dyn_model.x;
 % Path cost – Lagrange term (Time steps t = 1 … N-1)
 ocp.cost.cost_type            = 'NONLINEAR_LS';
 ocp.cost.W                    = blkdiag(W_x, W_u);
@@ -142,8 +145,9 @@ simulink_opts.outputs.xtraj         = 1;  % Predicted state trajectory
 simulink_opts.outputs.cost_value    = 1;  % Total cost of the optimal solution
 simulink_opts.outputs.KKT_residual  = 0;  % KKT residual (scalar value, disabled)
 simulink_opts.outputs.KKT_residuals = 1;  % KKT residuals (vectorial, enabled)
-simulink_opts.samplingtime   = '-1';  % Inherit sampling time from Simulink model
-simulink_opts.show_port_info =  1;    % Show port labels in the generated block
+
+simulink_opts.samplingtime   = '-1';      % Inherit sampling time from Simulink model
+simulink_opts.show_port_info =  1;        % Show port labels in the generated block
 
 ocp.simulink_opts = simulink_opts;
 
@@ -179,4 +183,6 @@ if ~(exist('sim_flag', 'var') && sim_flag)
     save('sfun_port_names.mat', 'sfun_input_names', 'sfun_output_names');
     cd ..
     disp('✅ Acados solver and S-Functions successfully generated!');
+
+    cd ..\..\03_Nonlinear_MPC\
 end

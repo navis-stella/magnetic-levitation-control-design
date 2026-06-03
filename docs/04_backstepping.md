@@ -70,16 +70,16 @@ $$
 K_v = c_0 + c_1 + c_2,\qquad K_p = 2 + c_0 c_1 + c_0 c_2 + c_1 c_2,\qquad K_i = c_0 + c_2 + c_0 c_1 c_2
 $$
 
-## 4.3 Relationship to FBL+SSC
-The current command above structurally matches the FBL+SSC form $i_s = (x_0 - x_1)\sqrt{(m/K_m)(v + g)}$ of [§5](05_feedback_linearization.md), with the virtual input identified as
+## 4.3 Relationship to Feedback Linearization
+The current command above structurally matches the Feedback Linearization form $i_s = (x_0 - x_1)\sqrt{(m/K_m)(v + g)}$ of [§5](05_feedback_linearization.md), with the virtual input identified as
 
 $$
 v = -K_v  x_2 - K_p  x_1 - K_i  \sigma
 $$
 
-The two designs reach a similar closed loop but expose different tuning knobs: FBL+SSC chooses three gains $(K_1, K_2, K_3)$ independently via pole placement or LQR, while backstepping chooses $(c_0, c_1, c_2)$ — per-stage Lyapunov decay rates — and the gains $(K_v, K_p, K_i)$ are nonlinear functions of those choices. Backstepping has fewer degrees of freedom but provides a Lyapunov stability certificate by construction; FBL+SSC has full gain freedom but offloads stability to the outer-loop design.
+The two designs reach a similar closed loop but expose different tuning knobs: Feedback Linearization chooses three gains $(K_1, K_2, K_3)$ independently via pole placement or LQR, while backstepping chooses $(c_0, c_1, c_2)$ — per-stage Lyapunov decay rates — and the gains $(K_v, K_p, K_i)$ are nonlinear functions of those choices. Backstepping has fewer degrees of freedom but provides a Lyapunov stability certificate by construction; Feedback Linearization has full gain freedom but offloads stability to the outer-loop design.
 
-The empirical confirmation of this equivalence appears in [§10](10_results.md): the FBL+SSC and Backstepping responses are indistinguishable on every performance metric.
+The empirical confirmation of this equivalence appears in [§10](10_results.md): the Feedback Linearization and Backstepping responses are indistinguishable on every performance metric.
 
 ## 4.4 Robustness Limitations and Implementation
 Like FBL, the cancellation relies on accurate $K_m$ and $m$. Parameter uncertainty produces residual perturbations not handled by the design. When matched bounded uncertainty dominates, SMC ([§6](06_sliding_mode_control.md)) remains preferable.

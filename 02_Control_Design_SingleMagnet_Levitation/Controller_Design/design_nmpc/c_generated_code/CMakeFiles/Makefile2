@@ -151,8 +151,8 @@ CMakeFiles/ocp_singleMaglev.dir/clean:
 # Target rules for target CMakeFiles/acados_ocp_solver_singleMaglev.dir
 
 # All Build rule for target.
-CMakeFiles/acados_ocp_solver_singleMaglev.dir/all: CMakeFiles/ocp_singleMaglev.dir/all
 CMakeFiles/acados_ocp_solver_singleMaglev.dir/all: CMakeFiles/model_singleMaglev.dir/all
+CMakeFiles/acados_ocp_solver_singleMaglev.dir/all: CMakeFiles/ocp_singleMaglev.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\acados_ocp_solver_singleMaglev.dir\build.make CMakeFiles/acados_ocp_solver_singleMaglev.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\acados_ocp_solver_singleMaglev.dir\build.make CMakeFiles/acados_ocp_solver_singleMaglev.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=E:\WorkSpace\GitHub\magnetic-levitation-control-design\02_Control_Design_SingleMagnet_Levitation\Controller_Design\design_nmpc\c_generated_code\CMakeFiles --progress-num=1 "Built target acados_ocp_solver_singleMaglev"

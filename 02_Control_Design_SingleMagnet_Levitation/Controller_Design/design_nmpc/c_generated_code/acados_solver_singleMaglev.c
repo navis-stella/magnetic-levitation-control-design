@@ -509,7 +509,6 @@ void singleMaglev_acados_setup_nlp_in(singleMaglev_solver_capsule* capsule, cons
     // change only the non-zero elements:
     W_0[0+(NY0) * 0] = 1000;
     W_0[1+(NY0) * 1] = 10;
-    W_0[2+(NY0) * 2] = 0.01;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, 0, "W", W_0);
     free(W_0);
     double* yref = calloc(NY, sizeof(double));

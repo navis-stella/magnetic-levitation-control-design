@@ -68,8 +68,8 @@ $$
 guaranteeing finite-time reaching of the boundary layer.
 
 ## 6.6 Implementation Variants
-- **`Maglev_SMC_block_ideal.slx`** — uses the built-in Sliding Mode Controller block from Simulink Control Design, with the ideal Simscape velocity. Reference baseline for cross-checking.
-- **`Maglev_SMC_mfunc.slx`** — user-defined MATLAB Function implementing the full control law of §6.8 (integral-action variant), running on the EKF-estimated state. This is the version exercised in the [§9](09_evaluation_framework.md) evaluation.
+- **`Maglev_SMC_block_test.slx`** — uses the built-in Sliding Mode Controller block from Simulink Control Design, with the ideal Simscape velocity. Reference baseline for cross-checking.
+- **`Maglev_SMC_mfcn.slx`** — user-defined MATLAB Function implementing the full control law of §6.8 (integral-action variant), running on the EKF-estimated state. This is the version exercised in the [§9](09_evaluation_framework.md) evaluation.
 
 ## 6.7 Behavior Under EKF-Estimated Velocity
 The SMC design above was validated against the ideal Simscape velocity. When the velocity is replaced by the EKF estimate $\hat{x}_2$ (as on hardware), the equivalent control $u_{eq}$ no longer exactly cancels gravity, because the small phase lag and bias of $\hat{x}_2$ enter the controller as an effective matched disturbance. The reaching law's switching term absorbs this disturbance into the boundary layer, but the trajectory settles at $|s| \leq \phi$ rather than at $s = 0$ — and on the standard surface $s = \lambda x_1 + x_2$, a non-zero $s$ implies a non-zero $x_1$ at steady state.

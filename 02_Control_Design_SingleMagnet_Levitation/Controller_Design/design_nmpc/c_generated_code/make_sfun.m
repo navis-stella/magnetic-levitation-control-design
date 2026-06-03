@@ -134,8 +134,8 @@ input_note = strcat(input_note, num2str(i_in), ') parameters - concatenated for 
                     ' size [84]\n ');
 sfun_input_names = [sfun_input_names; 'parameter_traj [84]'];
 i_in = i_in + 1;
-input_note = strcat(input_note, num2str(i_in), ') y_ref_0 - size [3]\n ');
-sfun_input_names = [sfun_input_names; 'y_ref_0 [3]'];
+input_note = strcat(input_note, num2str(i_in), ') y_ref_0 - size [2]\n ');
+sfun_input_names = [sfun_input_names; 'y_ref_0 [2]'];
 i_in = i_in + 1;
 
 
@@ -162,8 +162,8 @@ i_in = i_in + 1;
 
 
 
-input_note = strcat(input_note, num2str(i_in), ') cost_W_0 in column-major format, size [9]\n ');
-sfun_input_names = [sfun_input_names; 'cost_W_0 [9]'];
+input_note = strcat(input_note, num2str(i_in), ') cost_W_0 in column-major format, size [4]\n ');
+sfun_input_names = [sfun_input_names; 'cost_W_0 [4]'];
 i_in = i_in + 1;
 input_note = strcat(input_note, num2str(i_in), ') cost_W in column-major format, that is set for all intermediate stages: 1 to N-1, size [9]\n ');
 sfun_input_names = [sfun_input_names; 'cost_W [9]'];

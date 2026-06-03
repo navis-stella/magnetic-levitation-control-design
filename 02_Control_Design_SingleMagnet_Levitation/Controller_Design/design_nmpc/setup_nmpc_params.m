@@ -23,6 +23,7 @@ nmpc.Ts = 0.005;  % Sampling time (seconds)
 nmpc.N  = 20;     % Prediction horizon (number of steps)
 nmpc.nx = 2;      % Dimension of state space (nx)
 nmpc.nu = 1;      % Dimension of control input (nu)
+
 % Definition of reference values and physical parameters (S-Function input)
 i_eq   = airgap_eq * sqrt(mass * grav / Km); % Equilibrium current
 p_val  = [Km; mass; airgap_eq; grav];        % Parameter vector
@@ -35,17 +36,20 @@ W_u = 0.01;                  % Control input weighting (energy consumption)
 % Constraints and reference trajectories for the solver
 nmpc.dyn_pval   = p_val;
 nmpc.dyn_ptraj  = repmat(p_val, nmpc.N+1, 1);
+
 % Reference values (y_ref) for initial step, horizon, and terminal state
-nmpc.y_ref_0    = [0; 0; i_eq];
+nmpc.y_ref_0    = [0; 0];
 nmpc.y_ref      = repmat([0; 0; i_eq], nmpc.N-1, 1);
 nmpc.y_ref_e    = [0; 0];
+
 % Current limits (Constraints)
 nmpc.lh         = repmat(I_min, nmpc.N-1, 1); % Lower bound
 nmpc.uh         = repmat(I_max, nmpc.N-1, 1); % Upper bound
 nmpc.lh_0       = I_min;
 nmpc.uh_0       = I_max;
+
 % Reshaping weighting matrices for export (column vectors)
-nmpc.cost_W_0 = reshape(blkdiag(W_x, W_u), [], 1);
+nmpc.cost_W_0 = reshape(W_x, [], 1);
 nmpc.cost_W   = reshape(blkdiag(W_x, W_u), [], 1);
 nmpc.cost_W_e = reshape(W_x, [], 1);
 
@@ -57,5 +61,20 @@ nmpc.x_init_con = [(airgap_soll-airgap_init)*1e-3; 0];
 
 %% Data Storage
 % Save MPC parameters in the "Controller_Params" folder
-save('../../Controller_Params/StdNMPCData.mat', 'nmpc')
+thisDir     = fileparts(mfilename('fullpath'));
+projectRoot = fileparts(fileparts(thisDir));          
+paramDir    = fullfile(projectRoot, 'Controller_Params');
+    
+if ~exist(paramDir, 'dir')
+    mkdir(paramDir);
+end
+    
+savePath = fullfile(paramDir, 'StandardNMPCData.mat');
+save(savePath, 'nmpc');
+cd (paramDir)
+
 fprintf('Success: The MPC parameters have been saved in the "Controller_Params" folder.\n');
+
+if exist('genFlag','var')
+    cd (thisDir)
+end

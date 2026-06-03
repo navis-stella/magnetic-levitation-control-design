@@ -32,7 +32,7 @@ The gain $K$ is obtained either by **pole placement** (`place`) or by **LQR** (`
 
 ## 3.4 Implementation Variants
 
-- **`Maglev_SSC_ideal.slx`** — assumes a clean position measurement and computes velocity from a derivative-with-filter block. Used to verify the gain design against the linearized plant.
+- **`Maglev_SSC_test.slx`** — assumes a clean position measurement and computes velocity from a derivative-with-filter block. Used to verify the gain design against the linearized plant.
 - **`Maglev_SSC.slx`** — runs on the EKF estimate (see [§8](08_ekf.md)), the realistic configuration that mirrors hardware deployment.
 
 The gain matrix $K$ is configured in `Controller_Design/design_linear_controller.m` and saved to `Controller_Params/LinearControllerData.mat`.

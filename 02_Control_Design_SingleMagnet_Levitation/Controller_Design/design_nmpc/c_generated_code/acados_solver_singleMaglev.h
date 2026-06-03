@@ -61,7 +61,7 @@
 #define SINGLEMAGLEV_NG     0
 #define SINGLEMAGLEV_NBXN   0
 #define SINGLEMAGLEV_NGN    0
-#define SINGLEMAGLEV_NY0    3
+#define SINGLEMAGLEV_NY0    2
 #define SINGLEMAGLEV_NY     3
 #define SINGLEMAGLEV_NYN    2
 #define SINGLEMAGLEV_N      20
