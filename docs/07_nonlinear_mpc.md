@@ -83,7 +83,7 @@ $$
 
 The new third column reflects the additive entry of $d$ on the velocity equation; the new third row encodes the random-walk dynamics $\dot{d}=0$. The output Jacobian is the constant $\tilde{H} = [1\enspace 0\enspace 0]$ — only position is measured.
 
-The process- and measurement-noise covariances follow the §8 philosophy without modification: $R$ matches the eddy-current sensor specification, $Q$ is diagonal with near-zero $q_\text{pos}$, sizeable $q_\text{vel}$, and a small $q_d$ that sets how quickly the filter adapts to changes in the disturbance. No special tuning was required — the structural choices of §8 carry over directly.
+The process- and measurement-noise covariances follow the [§8](08_ekf.md) philosophy without modification: $R$ matches the eddy-current sensor specification, $Q$ is diagonal with near-zero $q_\text{pos}$, sizeable $q_\text{vel}$, and a small $q_d$ that sets how quickly the filter adapts to changes in the disturbance. No special tuning was required — the structural choices of [§8](08_ekf.md) carry over directly.
 
 **Observability.** A rank check on the augmented pair $(\tilde{A}, \tilde{H})$ at the operating point confirms that the position measurement is sufficient to recover all three augmented states. This is the standard offset-free MPC observability requirement: the disturbance must be observable through the same measurement that drives the original state estimate.
 

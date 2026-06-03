@@ -27,9 +27,9 @@ Four time windows define the metrics consistently:
 | Window | Range | Used for |
 |---|---|---|
 | Initial transient | $0 \leq t < T_{\text{stp}}$ | settling-process metrics |
-| Unforced steady state | $0.7\,T_{\text{stp}} \leq t < T_{\text{stp}}$ | residual error before disturbance |
+| Unforced steady state | $0.7 T_{\text{stp}} \leq t < T_{\text{stp}}$ | residual error before disturbance |
 | Disturbance window | $T_{\text{stp}} \leq t \leq T_{\text{sim}}$ | disturbance-rejection metrics |
-| Final steady state | $T_{\text{stp}} + 0.9\,(T_{\text{sim}} - T_{\text{stp}}) \leq t \leq T_{\text{sim}}$ | residual error under sustained disturbance |
+| Final steady state | $T_{\text{stp}} + 0.9 (T_{\text{sim}} - T_{\text{stp}}) \leq t \leq T_{\text{sim}}$ | residual error under sustained disturbance |
 
 All window boundaries are expressed as fractions of `T_stp` and `T_sim`, so changing the simulation horizon in `setup_sim_params.m` automatically rescales the metric definitions. The steady-state windows are deliberately *time-window* based rather than *sample-count* based, which keeps them robust against variable-step solvers and any future change in the model's solver configuration.
 
@@ -40,19 +40,19 @@ All window boundaries are expressed as fractions of `T_stp` and `T_sim`, so chan
 - *Rise time* — $10\% \to 90\%$ of the reference step.
 - *Settling time* — last time the trajectory exits the $\pm 2\%$ band around the target.
 - *Unforced steady-state error* — mean deviation in the unforced-steady-state window.
-- *Transient control energy* — $\int_0^{T_{\text{stp}}} (i_s - i_{\text{eq}})^2\,dt$, with $i_{\text{eq}}$ estimated from the pre-disturbance current plateau.
+- *Transient control energy* — $\int_0^{T_{\text{stp}}} (i_s - i_{\text{eq}})^2 dt$, with $i_{\text{eq}}$ estimated from the pre-disturbance current plateau.
 
 **Disturbance rejection (six metrics).**
 - *Peak deviation* — maximum $|x_s - x_0|$ in the disturbance window.
 - *Recovery time* — disturbance onset → last exit of the $\pm 2\%$ band.
 - *Final steady-state error* — mean residual in the final-steady-state window.
-- *IAE (Integral of Absolute Error)* — $\int |e(t)|\,dt$ over the disturbance window.
-- *ITAE (Integral of Time-weighted Absolute Error)* — $\int t\,|e(t)|\,dt$ over the disturbance window, with $t$ measured from disturbance onset. Penalizes slow recovery more heavily than IAE and so distinguishes "fast peak, fast recovery" from "fast peak, slow recovery" — a distinction IAE alone cannot draw.
-- *Disturbance control energy* — $\int_{T_{\text{stp}}}^{T_{\text{sim}}} (i_s - i_{\text{eq}})^2\,dt$.
+- *IAE (Integral of Absolute Error)* — $\int |e(t)| dt$ over the disturbance window.
+- *ITAE (Integral of Time-weighted Absolute Error)* — $\int t |e(t)| dt$ over the disturbance window, with $t$ measured from disturbance onset. Penalizes slow recovery more heavily than IAE and so distinguishes "fast peak, fast recovery" from "fast peak, slow recovery" — a distinction IAE alone cannot draw.
+- *Disturbance control energy* — $\int_{T_{\text{stp}}}^{T_{\text{sim}}} (i_s - i_{\text{eq}})^2 dt$.
 
 **Current quality (three metrics, computed over the command current).**
 - *Peak current* — full simulation. Sets the actuator sizing requirement.
-- *RMS current* — full simulation, time-weighted ($\sqrt{\int i^2\,dt / T_{\text{sim}}}$, not sample-mean). Drives thermal load.
+- *RMS current* — full simulation, time-weighted ($\sqrt{\int i^2 dt / T_{\text{sim}}}$, not sample-mean). Drives thermal load.
 - *Total Variation (TV)* — $\sum |\Delta i|$ over the first 200 ms of the disturbance window. Captures true controller activity under excitation, separating it from quiescent sensor-noise tracking.
 
 The energy metric is reported **separately** for the transient and disturbance phases rather than as a single total. A controller that uses heavy actuation during startup but recovers passively under disturbance is a structurally different design from one that does the opposite; conflating the two into one number hides the distinction.
