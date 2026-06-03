@@ -93,7 +93,7 @@ This observer is used only inside the offset-free NMPC. The unaugmented EKF of [
 
 Under a nonzero $\hat{d}$, the origin is no longer an equilibrium of the augmented plant — driving the state to zero is no longer the right objective, because the disturbance estimate would persistently fight the controller. Instead, the controller must drive the state to the **achievable steady state** consistent with the current disturbance estimate and the reference set-point $z_\text{ref}$.
 
-Setting $\dot{x}_2 = 0$ in the augmented dynamics at $x_1 = z_\text{ref}$ and solving for the steady-state input:
+Setting $\dot{x}_2 = 0$ in the augmented dynamics at $x_1 = z_{ref}$ and solving for the steady-state input:
 
 $$
 \frac{K_m}{m}\cdot\frac{u_s^2}{(x_0 - z_\text{ref})^2} = g - \hat{d} \quad\Longrightarrow\quad u_s = (x_0 - z_\text{ref})\sqrt{\frac{m (g - \hat{d})}{K_m}}
