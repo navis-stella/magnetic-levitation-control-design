@@ -78,7 +78,7 @@ This augmented model is used **both** as the OCP prediction model and as the obs
 The augmented state $\tilde{\mathbf{x}} = [x_1, x_2, d]^\top$ is estimated by an augmented EKF that reuses the structural pattern of [§8](08_ekf.md): Euler-forward discretization at $T_s = 100\,\mu\text{s}$, recursive predict/update, position-only measurement $y = x_1 + n$. The continuous-time Jacobian becomes
 
 $$
-\tilde{F}_c(\hat{\tilde{\mathbf{x}}}, i_s) = \begin{bmatrix} 0 & 1 & 0 \\\\[6pt] \dfrac{2 K_m\,i_s^2}{m(x_0 - \hat{x}_1)^3} & 0 & 1 \\\\[6pt] 0 & 0 & 0 \end{bmatrix}
+\tilde{F}_c(\hat{\tilde{\mathbf{x}}}, i_s) = \begin{bmatrix} 0 & 1 & 0 \\\\[6pt] \dfrac{2 K_m i_s^2}{m(x_0 - \hat{x}_1)^3} & 0 & 1 \\\\[6pt] 0 & 0 & 0 \end{bmatrix}
 $$
 
 The new third column reflects the additive entry of $d$ on the velocity equation; the new third row encodes the random-walk dynamics $\dot{d}=0$. The output Jacobian is the constant $\tilde{H} = [1\enspace 0\enspace 0]$ — only position is measured.
@@ -93,7 +93,7 @@ This observer is used only inside the offset-free NMPC. The unaugmented EKF of [
 
 Under a nonzero $\hat{d}$, the origin is no longer an equilibrium of the augmented plant — driving the state to zero is no longer the right objective, because the disturbance estimate would persistently fight the controller. Instead, the controller must drive the state to the **achievable steady state** consistent with the current disturbance estimate and the reference set-point $z_\text{ref}$.
 
-Setting $\dot{x}_2 = 0$ in the augmented dynamics at $x_1 = z_{ref}$ and solving for the steady-state input:
+Setting $\dot{x}_2 = 0$ in the augmented dynamics at $x_1 = z_\text{ref}$ and solving for the steady-state input:
 
 $$
 \frac{K_m}{m}\cdot\frac{u_s^2}{(x_0 - z_\text{ref})^2} = g - \hat{d} \quad\Longrightarrow\quad u_s = (x_0 - z_\text{ref})\sqrt{\frac{m\,(g - \hat{d})}{K_m}}
