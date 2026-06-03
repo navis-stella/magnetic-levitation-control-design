@@ -13,7 +13,7 @@ The maglev plant has nonlinear dynamics, hard input constraints (amplifier curre
 At each sampling instant, the controller solves
 
 $$
-\min_{u_0, \ldots, u_{N-1}} \sum_{k=0}^{N-1}\Big(\mathbf{x}_k^\top Q\,\mathbf{x}_k + u_k^\top R\,u_k\Big) + \mathbf{x}_N^\top Q_N\,\mathbf{x}_N
+\min_{u_0, \ldots, u_{N-1}} \sum_{k=0}^{N-1}\Big(\mathbf{x}_k^\top Q \mathbf{x}_k + u_k^\top R u_k\Big) + \mathbf{x}_N^\top Q_N \mathbf{x}_N
 $$
 
 subject to
@@ -75,10 +75,10 @@ This augmented model is used **both** as the OCP prediction model and as the obs
 
 ### 7.5.2 Augmented EKF
 
-The augmented state $\tilde{\mathbf{x}} = [x_1, x_2, d]^\top$ is estimated by an augmented EKF that reuses the structural pattern of [§8](08_ekf.md): Euler-forward discretization at $T_s = 100\,\mu\text{s}$, recursive predict/update, position-only measurement $y = x_1 + n$. The continuous-time Jacobian becomes
+The augmented state $\tilde{\mathbf{x}} = [x_1, x_2, d]^\top$ is estimated by an augmented EKF that reuses the structural pattern of [§8](08_ekf.md): Euler-forward discretization at $T_s = 100 \mu\text{s}$, recursive predict/update, position-only measurement $y = x_1 + n$. The continuous-time Jacobian becomes
 
 $$
-\tilde{F}_c(\hat{\tilde{\mathbf{x}}}, i_s) = \begin{bmatrix} 0 & 1 & 0 \\\\[6pt] \dfrac{2 K_m\,i_s^2}{m(x_0 - \hat{x}_1)^3} & 0 & 1 \\\\[6pt] 0 & 0 & 0 \end{bmatrix}
+\tilde{F}_c(\hat{\tilde{\mathbf{x}}}, i_s) = \begin{bmatrix} 0 & 1 & 0 \\\\[6pt] \dfrac{2 K_m i_s^2}{m(x_0 - \hat{x}_1)^3} & 0 & 1 \\\\[6pt] 0 & 0 & 0 \end{bmatrix}
 $$
 
 The new third column reflects the additive entry of $d$ on the velocity equation; the new third row encodes the random-walk dynamics $\dot{d}=0$. The output Jacobian is the constant $\tilde{H} = [1\enspace 0\enspace 0]$ — only position is measured.
@@ -96,10 +96,10 @@ Under a nonzero $\hat{d}$, the origin is no longer an equilibrium of the augment
 Setting $\dot{x}_2 = 0$ in the augmented dynamics at $x_1 = z_\text{ref}$ and solving for the steady-state input:
 
 $$
-\frac{K_m}{m}\cdot\frac{u_s^2}{(x_0 - z_\text{ref})^2} = g - \hat{d} \quad\Longrightarrow\quad u_s = (x_0 - z_\text{ref})\sqrt{\frac{m\,(g - \hat{d})}{K_m}}
+\frac{K_m}{m}\cdot\frac{u_s^2}{(x_0 - z_\text{ref})^2} = g - \hat{d} \quad\Longrightarrow\quad u_s = (x_0 - z_\text{ref})\sqrt{\frac{m (g - \hat{d})}{K_m}}
 $$
 
-The corresponding state target is $x_s = [z_\text{ref},\,0]^\top$ — position at the reference, zero velocity.
+The corresponding state target is $x_s = [z_\text{ref}, 0]^\top$ — position at the reference, zero velocity.
 
 The MATLAB function **`target_ss_calc.m`** implements this analytical solution with three guards before returning:
 
@@ -116,7 +116,7 @@ The reference $z_\text{ref}$ defaults to zero — track the linearization equili
 The offset-free OCP is the standard NMPC of [§7.2](07_nonlinear_mpc.md) with the zero-reference replaced by the recomputed target $(x_s, u_s)$:
 
 $$
-\min_{u_0, \ldots, u_{N-1}} \sum_{k=0}^{N-1}\left[(\mathbf{x}_k - x_s)^\top Q\,(\mathbf{x}_k - x_s) + (u_k - u_s)^\top R\,(u_k - u_s)\right] + (\mathbf{x}_N - x_s)^\top Q_N\,(\mathbf{x}_N - x_s)
+\min_{u_0, \ldots, u_{N-1}} \sum_{k=0}^{N-1}\left[(\mathbf{x}_k - x_s)^\top Q (\mathbf{x}_k - x_s) + (u_k - u_s)^\top R (u_k - u_s)\right] + (\mathbf{x}_N - x_s)^\top Q_N (\mathbf{x}_N - x_s)
 $$
 
 subject to the same augmented plant dynamics, the same input bounds, and the same initial-state constraint $\mathbf{x}_0 = \hat{\mathbf{x}}(t)$ as the standard formulation. The target $(x_s, u_s)$ is recomputed at every sample from the latest $\hat{d}$ — it is a function of the disturbance estimate, not a fixed design parameter. As $\hat{d}$ converges to the true disturbance, $(x_s, u_s)$ converges to the true achievable steady state, and the OCP optimum coincides with the plant's true zero-error operating point. This is exactly the role that the integral state plays in the closed-form controllers, expressed in the optimization framework.
