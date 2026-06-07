@@ -1,6 +1,6 @@
 # 10. Results & Discussion
 
-The script `evaluation_controllers.m` (see [§9](09_evaluation_framework.md)) runs all six EKF-based controllers — PID, SSC, FeedbackLin, Backstepping, SMC, and the offset-free NMPC — against the same Simscape plant, the same EKF, the same reference step (initial air gap 2.5 mm → target 2.0 mm), and the same external disturbance (a –19.6 N step in the gravity direction at $t = 1$ s). The full simulation is run twice: once with the eddy-current measurement noise active (the realistic hardware-deployment scenario) and once with noise deactivated (a structural benchmark that exposes each controller's behavior under ideal sensing).
+The script `evaluation_controllers.m` (see [§9](09_evaluation_framework.md)) runs all six EKF-based controllers — PID, SSC, Backstepping, FeedbackLin, SMC, and the offset-free NMPC — against the same Simscape plant, the same EKF, the same reference step (initial air gap 2.5 mm → target 2.0 mm), and the same external disturbance (a –19.6 N step in the gravity direction at $t = 1$ s). The full simulation is run twice: once with the eddy-current measurement noise active (the realistic hardware-deployment scenario) and once with noise deactivated (a structural benchmark that exposes each controller's behavior under ideal sensing).
 
 This dual-scenario evaluation separates two questions that a single-scenario comparison conflates: *what does each controller achieve when given perfect information* (the structural benchmark) and *what does each controller achieve when given the actual measurement signal* (the realistic deployment). For the integral-action controllers the answers are nearly the same; for the offset-free NMPC they reveal an important distinction that §10.4 unpacks.
 
@@ -102,7 +102,7 @@ Pulling §10.1–§10.4 together, the six controllers cluster into four distinct
 
 - **PID** — fastest rise, worst overshoot, highest actuator stress. The classical SISO trade-off, executed faithfully.
 - **SSC** — most damped among the linear-feedback designs, second-best disturbance rejection in the closed-form group. The clean MIMO-scalable default.
-- **FeedbackLin and Backstepping** — empirically indistinguishable, as predicted by [§4.3](04_backstepping.md). Either is appropriate when the operating range extends beyond the linearization neighborhood and the model parameters are well known.
+- **Backstepping and FeedbackLin** — empirically indistinguishable, as predicted by [§4.3](04_backstepping.md). Either is appropriate when the operating range extends beyond the linearization neighborhood and the model parameters are well known.
 - **SMC** — best closed-form disturbance rejection: smallest peak deviation, fastest recovery, and lowest disturbance-window IAE among the five closed-form controllers.
 - **NMPC (offset-free)** — structurally distinct. Slowest rise but effectively zero overshoot, dominant disturbance rejection (4–9× better than the best closed-form), and the only controller that achieves near-zero residual error against a constant disturbance.
 

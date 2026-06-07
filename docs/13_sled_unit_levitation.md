@@ -134,7 +134,7 @@ The LQR is designed on the unaugmented pair $(A, B)$ with block-diagonal weights
 
 Note that **no integral states are appended to the controller** — offset-free behavior is delivered by the disturbance-feedforward mechanism of S4, not by controller-side integration.
 
-**S4 — Disturbance feedforward.** The augmented observer (S6) provides a five-dimensional estimate $\hat{d} = [\hat{F}_x, \hat{F}_y, \hat{M}_\theta, \hat{M}_\phi, \hat{M}_\psi]^\top$ of the residual generalized force/moment acting on the sled. At steady state ($\mathbf{q} = 0$, $\dot{\mathbf{q}} = 0$) the velocity equation requires
+**S4 — Disturbance feedforward.** The augmented observer (S6) provides a five-dimensional estimate $\hat{d} = [\hat{F}_{x}, \hat{F}_{y}, \hat{M}_{\theta}, \hat{M}_{\phi}, \hat{M}_{\psi}]^\top$ of the residual generalized force/moment acting on the sled. At steady state ($\mathbf{q} = 0$, $\dot{\mathbf{q}} = 0$) the velocity equation requires
 
 $$
 0 = K_i  \mathbf{u}_\text{ss} + \hat{d} \quad\Longrightarrow\quad \mathbf{u}_\text{ss} = -K_i^{\dagger}  \hat{d}
