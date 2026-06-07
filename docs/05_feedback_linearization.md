@@ -91,4 +91,4 @@ The crucial difference from [§3](03_state_space_control.md): $A_{\text{FBL}}$ c
 - **Singularity.** The transformation is invertible as long as $x_0 - x_1 > 0$ — i.e., the mass has not contacted the magnet. A current limiter is applied after the square root to handle saturation gracefully.
 - **Real-time cost.** Negligible: one squaring, one division, one square root per control step.
 
-The outer-loop gain matrix $K$ is configured in `Controller_Design/design_nonlinear_controller.m`. The model is `Maglev_FBL_SSC.slx`, running on the EKF estimate (see [§8](08_ekf.md)).
+The outer-loop gain matrix $K$ is configured in `Controller_Design/design_nonlinear_controller.m`. The model is `Maglev_FeedbackLinslx`, running on the EKF estimate (see [§8](08_ekf.md)).
