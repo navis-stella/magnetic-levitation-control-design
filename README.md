@@ -1,6 +1,6 @@
 # Magnetic Levitation Control Design
 
-> Simscape-based design of magnetic levitation controllers — from a single-magnet model to a 5-DOF slide with eight electromagnets.
+> Simscape-based design of magnetic levitation controllers — from a single-magnet model to a 5-DOF sled with eight electromagnets.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![MATLAB R2025a](https://img.shields.io/badge/MATLAB-R2025a-blue.svg)](https://www.mathworks.com/products/matlab.html)
@@ -11,20 +11,20 @@ This project develops the modeling and control infrastructure for magnetic levit
 
 1. **A single-magnet 1-DOF testbed** — used as the platform for designing and benchmarking five closed-form integral-action controllers (PID, state-space, backstepping, feedback linearization, sliding mode) and an offset-free nonlinear MPC. An Extended Kalman Filter observes the state from a noisy gap measurement (with an augmented variant used by the offset-free MPC), making the simulation faithful to a hardware deployment.
 2. **A dual-magnet 1-DOF system** — used to validate the Simscape Multibody modeling workflow (frame conventions, force–motion coupling, CAD-based geometry) on a system simple enough to verify by hand.
-3. **A 5-DOF slide with eight electromagnets** — the final, industrially-realistic system. A state-space controller with integral action and a Kalman observer levitate the slide against an over-actuated magnetic configuration, validated by a full closed-loop verification suite (separation principle, MIMO singular-value analysis, sensitivity-based robustness margins).
+3. **A 5-DOF sled-unit with eight electromagnets** — the final, industrially-realistic system. A state-space controller with integral action and a Kalman observer levitate the sled-unit against an over-actuated magnetic configuration, validated by a full closed-loop verification suite (separation principle, MIMO singular-value analysis, sensitivity-based robustness margins).
 
-The single-magnet stage is exhaustive (six controllers + observer + comparison) because the goal there is *to understand which control technique fits magnetic levitation best*. The dual- and slide-unit stages then apply the chosen technique (state-space control with integral action) to systems where the choice begins to matter for real engineering reasons — primarily multi-DOF scaling.
+The single-magnet stage is exhaustive (six controllers + observer + comparison) because the goal there is *to understand which control technique fits magnetic levitation best*. The dual- and sled-unit stages then apply the chosen technique (state-space control with integral action) to systems where the choice begins to matter for real engineering reasons — primarily multi-DOF scaling.
 
 ## Repository Structure
 
 ```
 .
-├── 00_Shared_Library/                       Reusable Simulink subsystems
-├── 01_Electromagnet_Modeling_Simscape/      Simscape Magnetic plant model
-├── 02_Control_Design_SingleMagnet_Levitation/   Six controllers + EKF + evaluation
-├── 03_Control_Design_DualMagnet_Levitation/     Multibody modeling validation
-├── 04_Control_Design_SlideUnit_Levitation/       5-DOF, 8-magnet final system
-├── docs/                                    Detailed derivations and chapters
+├── 00_Shared_Library/                            Reusable Simulink subsystems
+├── 01_Electromagnet_Modeling_Simscape/           Simscape Magnetic plant model
+├── 02_Control_Design_SingleMagnet_Levitation/    Six controllers + EKF + evaluation
+├── 03_Control_Design_DualMagnet_Levitation/      Multibody modeling validation
+├── 04_Control_Design_SledUnit_Levitation/        5-DOF, 8-magnet final system
+├── docs/                                         Detailed derivations and chapters
 └── README.md
 ```
 
@@ -52,14 +52,14 @@ The controllers and observers are pre-designed and their parameters are saved in
 % From the repository root:
 addpath(genpath(pwd));
 
-% 1. Single-magnet comparison (PID, SSC, FeedbackLin, Backstepping, SMC, OffsetFree NMPC)
+% 1. Single-magnet comparison (PID, SSC, Backstepping, FeedbackLin, SMC, OffsetFree NMPC)
 cd 02_Control_Design_SingleMagnet_Levitation
 run evaluation_controllers.m
 %    → Results in 02_*/Results/
 
-% 2. slide-unit (5-DOF, 8 magnets) closed-loop test
-cd ../04_Control_Design_SlideUnit_Levitation
-run evaluation_slide_levitation.m
+% 2. Sled-unit (5-DOF, 8 magnets) closed-loop test
+cd ../04_Control_Design_SledUnit_Levitation
+run evaluation_sled_levitation.m
 %    → Results in 04_*/Results/
 ```
 
@@ -69,7 +69,7 @@ If you change any physical parameter (mass, nominal air gap, current limit, geom
 
 The repository is organized so that each system stage is self-contained. Detailed derivations, design choices, and implementation notes live in `docs/`; this README is the landing page.
 
-### Stage 1A — Electromagnet Modeling (folder 01)
+### Stage 1 — Electromagnet Modeling (folder 01)
 
 Folder `01_Electromagnet_Modeling_Simscape/` is the foundation of the project: building a Simscape Magnetic model of a single electromagnet, driving it from a supplied current source, and verifying its behavior against a mass with gravity using an ideal translational sensor. The goal of this stage is to **understand how to model an electromagnet using the Simscape Magnetic library** — what blocks to use, how the magnetic network connects to the mechanical domain, and how the resulting force matches the analytical reluctance-force expression.
 
@@ -83,9 +83,9 @@ Once validated, the electromagnet model is packaged as a referenced subsystem **
 
 These assumptions yield the analytical reluctance-force expression $F_R = K_M\,i_s^2 / x_s^2$ used throughout [§1](docs/01_system_modeling.md) and every controller derivation that follows. They are accurate for the operating range considered here and are the standard starting point for magnetic-bearing control. **Users targeting more realistic operating conditions** — large currents approaching saturation, geometry with significant fringe fields, or designs where leakage is non-negligible — can extend the Simscape model to capture those effects. The trade-off is increased simulation cost and a controller-design model that is no longer expressible in closed form.
 
-### Stage 1B — Single-Magnet Levitation Control (folder 02)
+### Stage 2 — Single-Magnet Levitation Control (folder 02)
 
-The plant is a single electromagnet attracting a ferromagnetic mass against gravity, using the `IntegratedElectromagnet` subsystem from Stage 1A. Six controllers are designed and compared:
+The plant is a single electromagnet attracting a ferromagnetic mass against gravity, using the `IntegratedElectromagnet` subsystem from Stage 1. Six controllers are designed and compared:
 
 | Chapter | Topic |
 |---|---|
@@ -101,21 +101,21 @@ The plant is a single electromagnet attracting a ferromagnetic mass against grav
 | [§10 — Results & Discussion](docs/10_results.md) | Performance data and engineering interpretation |
 | [§11 — Comparative Analysis](docs/11_comparative_analysis.md) | Choosing a controller — performance, complexity, scaling |
 
-### Stage 2 — Dual-Magnet Levitation (folder 03)
+### Stage 3 — Dual-Magnet Levitation (folder 03)
 
-A vertical sandwich of two electromagnets around a mobile mass, used to validate the Simscape Multibody modeling workflow (frame conventions, force–motion coupling, local-force vs. resultant-force comparison) on a system simple enough to cross-check by hand.
+A vertical sandwich of two electromagnets around a mobile sled, used to validate the Simscape Multibody modeling workflow (frame conventions, force–motion coupling, local-force vs. resultant-force comparison) on a system simple enough to cross-check by hand.
 
 | Chapter | Topic |
 |---|---|
 | [§12 — Dual-Magnet Levitation](docs/12_dual_magnet_levitation.md) | Multibody modeling, differential drive, SSC with integral action |
 
-### Stage 3 — Slide Unit Levitation (folder 04)
+### Stage 4 — Sled Unit Levitation (folder 04)
 
-A 5-DOF magnetically levitated slide with eight electromagnets (over-actuated, with center-of-mass offset), built from imported CAD geometry. A state-space controller with integral action and anti-windup, paired with a Kalman observer, levitates the slide and is validated by a closed-loop verification suite (separation principle, MIMO singular-value analysis, sensitivity-based robustness margins).
+A 5-DOF magnetically levitated sled-unit with eight electromagnets (over-actuated, with center-of-mass offset), built from imported CAD geometry. A state-space controller with integral action and anti-windup, paired with a Kalman observer, levitates the sled and is validated by a closed-loop verification suite (separation principle, MIMO singular-value analysis, sensitivity-based robustness margins).
 
 | Chapter | Topic |
 |---|---|
-| [§13 — Slide Unit Levitation](docs/13_slide_unit_levitation.md) | CAD-based multibody modeling, redundant-allocation SSC, Kalman observer, MIMO verification |
+| [§13 — Sled-Unit Levitation](docs/13_sled_unit_levitation.md) | CAD-based multibody modeling, redundant-allocation SSC, Kalman observer, MIMO verification |
 
 ## Results Highlight
 
@@ -125,7 +125,7 @@ All six controllers were benchmarked on the single-magnet plant under realistic 
   <img src="02_Control_Design_SingleMagnet_Levitation/Results/TimeResponse_noise_active.png" width="720" alt="Time Response"/>
 </div>
 
-> **Figure 0.1** — Air-gap time response of PID, SSC, FeedbackLin, Backstepping, SMC, and OffsetFree NMPC under identical step + disturbance test conditions.
+> **Figure 0.1** — Air-gap time response of PID, SSC, Backstepping, FeedbackLin, SMC, and OffsetFree NMPC under identical step + disturbance test conditions.
 
 <div align="center">
   <img src="02_Control_Design_SingleMagnet_Levitation/Results/DisturbanceRejection_noise_active.png" width="720" alt="Disturbance Rejection"/>
@@ -142,21 +142,22 @@ Four observations stand out and are unpacked in [§10](docs/10_results.md) and [
 
 ## Recommended Controller for Magnetic Bearing Applications
 
-For a single-DOF demonstration or research-scale plant, any of the six controllers performs well, and the choice is driven by what the project aims to demonstrate. For a general-purpose magnetic bearing system with **multiple degrees of freedom**, however, the structural argument favors a clear default:
+For a single-DOF demonstration or research-scale plant, any of the six controllers performs well, and the choice is driven by what the project aims to demonstrate. For a general-purpose magnetic bearing system with multiple degrees of freedom, however, the structural argument favors a clear default:
 
-> **State-space control with integral action** is the most practical default choice. It scales naturally and cleanly to MIMO (one larger matrix instead of a rewritten design), its tuning effort grows minimally with DOF, its real-time cost stays a matrix-vector product, and it pairs cleanly with the same EKF observer family used throughout this project. The nonlinear closed-form methods (FeedbackLin, Backstepping, SMC) remain compelling for specialized applications — large operating ranges, dominant model uncertainty, hard real-time disturbance rejection — and should be added on top of an SSC baseline when those needs arise, rather than chosen instead of it. **OffsetFree NMPC is the right tool** when explicit constraint handling, true offset-free behavior, or runtime operating-point flexibility is a hard requirement, accepting the trade-offs of higher implementation complexity, higher runtime cost, and the external acados dependency.
+**Linear state-space control with an offset-free augmentation is the most practical default choice.** Two equally valid routes to the offset-free property are demonstrated in this project: integral action in the controller ([§3](docs/03_state_space_control.md), [§12](docs/12_dual_magnet_levitation.md)) and disturbance estimation in an augmented Kalman observer with input feedforward ([§13](docs/13_sled_unit_levitation.md)). Both deliver zero residual error against constant disturbances; the choice between them is a design preference rather than a performance trade-off. Either approach scales naturally and cleanly to MIMO (one larger matrix instead of a rewritten design), tuning effort grows minimally with DOF, real-time cost stays a matrix-vector product, and the observer pairs cleanly with the same Kalman family used throughout this project. The nonlinear closed-form methods (Backstepping, FeedbackLin, SMC) remain compelling for specialized applications — large operating ranges, dominant model uncertainty, hard real-time disturbance rejection — and should be added on top of an SSC baseline when those needs arise, rather than chosen instead of it. Offset-Free NMPC is the right tool when explicit constraint handling, true offset-free behavior under runtime operating-point changes, or hard input-bound respect is a hard requirement, accepting the trade-offs of higher implementation complexity, higher runtime cost, and the external acados dependency.
 
-This recommendation is the central engineering conclusion of the project, demonstrated concretely by the dual-magnet ([§12](12_dual_magnet_levitation.md)) and slide-unit ([§13](13_slide_unit_levitation.md)) systems, where extending SSC to multi-DOF required no structural change to the design workflow.
+This recommendation is the central engineering conclusion of the project, demonstrated concretely by the dual-magnet ([§12](docs/12_dual_magnet_levitation.md)) and sled-unit ([§13](docs/13_sled_unit_levitation.md)) systems, where extending linear state-space control to multi-DOF required no structural change to the design workflow.
 
 ## Status and Future Work
 
-The single-magnet stage is complete (six controllers, EKF and augmented EKF, evaluation, comparative analysis). The dual-magnet and slide-unit stages are complete for the documented scope. One extension is documented as a natural next step but is not part of the current scope:
+The single-magnet stage is complete (six controllers, EKF and augmented EKF, evaluation, comparative analysis). The dual-magnet and sled-unit stages are complete for the documented scope. Two extensions are documented as natural next steps but are not part of the current scope:
 
-- **EKF on the slide-unit system** — the [§13](13_slide_unit_levitation.md) controller uses a linear Kalman filter for measurement-noise rejection. An EKF analogous to §8, re-derived for the multi-DOF nonlinear dynamics, would extend the project's hardware-readiness story to the slide-unit case.
+- **EKF on the sled-unit system** — the [§13](docs/13_sled_unit_levitation.md) controller pairs the LQR with a linear augmented Kalman observer operating on the linearized plant. Extending the observer to an EKF analogous to [§8](docs/08_ekf.md), re-derived for the multi-DOF nonlinear dynamics with the same disturbance-state augmentation, would tighten estimation accuracy across the wider operating range that a high-speed deployment may exercise.
+- **External-torque disturbance verification** — the [§13](docs/13_sled_unit_levitation.md) evaluation profile configures a $T_z$ step but does not exercise it because of a limitation with the Simscape External-Torque block on the current model. Verifying rotational-disturbance rejection directly via applied torque, in addition to the indirect coupling through the tip-frame force application, remains future work.
 
 ## Acknowledgments
 
-This work was carried out as a student-assistant research project. The high-speed-machine system that motivates the slide-unit chapter ([§13](13_slide_unit_levitation.md)) is part of a larger research effort led by the project supervisor; the slide-unit work in this repository is a controls and modeling contribution to that broader effort.
+This work was carried out as a student-assistant research project. The high-speed-machine system that motivates the sled-unit chapter ([§13](docs/13_sled_unit_levitation.md)) is part of a larger research effort led by the project supervisor; the sled-unit work in this repository is a controls and modeling contribution to that broader effort.
 
 ## License
 

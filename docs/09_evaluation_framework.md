@@ -80,6 +80,6 @@ The theoretical chapters work in the **deviation-coordinate frame** $x_1 = x_0 -
 
 The evaluation script plots in **absolute air-gap coordinates** — the y-axis reads directly in millimetres, `airgap_soll` is drawn as a horizontal reference line, and the $\pm 2\%$ band as dotted lines around it. This frame is the natural one for visual inspection: the configured target appears on the y-axis as a recognizable physical quantity (e.g. 2.0 mm), rather than as the abstract origin of a deviation variable. Both conventions describe the same physical signal.
 
-## 9.7 Note on the Slide-Unit Evaluation
+## 9.7 Note on the Sled-Unit Evaluation
 
-A parallel script `evaluation_slide_levitation.m` in folder 04 plays the same role for the 5-DOF slide-unit system — executes `SlideUnit_Levitation_Control.slx` programmatically, collects air-gap responses, current commands, and slide-pose trajectories, plots them, and writes the figures and raw `simulation_results.mat` to `04_*/Results/`. See [§13.6](13_Slide_unit_levitation.md) for details.
+A parallel script `evaluation_sled_levitation.m` in folder 04 plays the same role for the 5-DOF sled-unit system — executes `SledUnit_Levitation_Control.slx` programmatically, collects air-gap responses, current commands, and sled-pose trajectories, plots them, and writes the figures and raw `simulation_results.mat` to `04_*/Results/`. See [§13.6](13_sled_unit_levitation.md) for details.

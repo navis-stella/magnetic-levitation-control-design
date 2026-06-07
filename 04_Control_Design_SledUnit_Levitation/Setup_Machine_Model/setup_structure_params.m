@@ -32,7 +32,10 @@
 elMaglabels = {'ELO', 'ELU', 'ERO', 'ERU', 'SLO', 'SLU', 'SRO', 'SRU'};
 
 % Add path
-addpath('..\..\00_Shared_Library\')
+thisDir     = fileparts(mfilename('fullpath'));
+projectRoot = fileparts(fileparts(thisDir));   
+LibaryPath  = fullfile(projectRoot,'00_Shared_Library');
+addpath(LibaryPath);
 
 % Load physical constants and limit values
 init_system_const;
@@ -108,6 +111,7 @@ setup_sled_dyn_params;
 SpdTip2SlGCS.TV = [0; 0; -1050];      % Translation vector from SlGCS center [mm]
 SpdTip2SlGCS.RA = [0; 0; 0];          % Rotation angles [rad], ZYX convention
 
+
 %% ========================================================================
 %  Air Gap Calculation for all 8 Cartesian joints
 %  =======================================================================
@@ -117,14 +121,14 @@ calculate_airgap_equilibrium_and_rest
 %  Initial State & Air Gap Configuration
 %  ========================================================================
 % Option 1: Equilibrium state (Levitating)
-CartJointInit  = CartJointInit_eq;
-SUInitPosAtt.TV = SlGCS2SURCS.TV;
-SUInitPosAtt.RA = SlGCS2SURCS.RA;
+% CartJointInit  = CartJointInit_eq;
+% SUInitPosAtt.TV = SlGCS2SURCS.TV;
+% SUInitPosAtt.RA = SlGCS2SURCS.RA;
 
 % Option 2: Resting state (Landed/Static)
-% CartJointInit  = CartJointInit_Rest;
-% SUInitPosAtt.TV = SlGCS2SURCS_rest.TV;
-% SUInitPosAtt.RA = SlGCS2SURCS_rest.RA;
+CartJointInit  = CartJointInit_Rest;
+SUInitPosAtt.TV = SlGCS2SURCS_rest.TV;
+SUInitPosAtt.RA = SlGCS2SURCS_rest.RA;
 
 % --- Calculation of initial pose and sled state ---
 % Calculate relative displacement of the initial pose
@@ -134,7 +138,7 @@ R_init = eul2rotm(SUInitPosAtt.RA',  'ZYX');   % 3×3
 
 % Relative rotation: expressed in the reference system
 R_rel  = R_ref' * R_init;
-RA_rel = rotm2eul(R_rel, 'ZYX')';              % [3×1] column
+RA_rel = rotm2eul(R_rel, 'XYZ')';              % [3×1] column
 
 % Relative translation: transform initial translation back to reference system
 TV_rel = R_ref' * (SUInitPosAtt.TV - SlGCS2SURCS.TV);  % [3×1]
@@ -147,7 +151,12 @@ su_pos_tmp = SUInitPosAtt2SlGCS;
 su_pos_tmp(3) = []; % Remove Z-component (vertical) for specific DOF control
 
 % Combine position and zero-velocity vectors
-sled_init_state = vertcat(su_pos_tmp, zeros(numel(su_pos_tmp), 1));
+sled_init_state = vertcat(su_pos_tmp(1:2)*1e-3,su_pos_tmp(3:5), zeros(numel(su_pos_tmp), 1));
+
+% Initial state of the augmented observer
+obs_init_state = vertcat(su_pos_tmp(1:2)*1e-3,su_pos_tmp(3:5), ...
+                         zeros(numel(su_pos_tmp)*2, 1));
+
 
 % --- Air Gap Safety Limits & Nominal Values ---
 % Initial safety air gaps (ensures values do not drop below hardware threshold)
@@ -155,9 +164,11 @@ init_airgap_lw = max(CartJointInit.ELU(3), ElectromagnetConfig.minSafeAirGap);
 init_airgap_up = max(CartJointInit.ELO(3), ElectromagnetConfig.minSafeAirGap);
 
 % Calculate nominal air gap (mean of upper and lower air gaps)
-nom_airgap = mean([CartJointInit.ELU(3), CartJointInit.ELO(3)]);
+nom_airgap = mean([CartJointInit_eq.ELU(3), CartJointInit_eq.ELO(3)]);
 
 %% Display Results
+fprintf('========================================================================\n');
 fprintf('Initial air gap (bottom):   %0.4f mm \n', init_airgap_lw)
 fprintf('Initial air gap (top):      %0.4f mm \n', init_airgap_up)
 fprintf('Desired nominal air gap:    %0.4f mm \n', nom_airgap)
+fprintf('========================================================================\n');

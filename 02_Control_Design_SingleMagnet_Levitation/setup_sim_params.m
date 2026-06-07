@@ -78,7 +78,7 @@ grav = 9.80665;                      % Gravitational acceleration (ISO 80000-3) 
 Ts = 1e-4;                           % Sensor sampling time                [s]
                                      % (corresponds to 10 kHz sampling frequency)
 
-isNoiseActive = 0;                   % Noise activation: 1 = active, 0 = disabled
+isNoiseActive = 1;                   % Noise activation: 1 = active, 0 = disabled
 
 % Noise standard deviation of the position sensor
 sigma_n = 2e-3;                      % Sensor RMS noise ≈ 2 µm             [mm]

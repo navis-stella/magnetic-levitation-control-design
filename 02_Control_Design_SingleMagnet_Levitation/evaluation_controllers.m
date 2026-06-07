@@ -4,7 +4,7 @@
 %  PROJECT   : Single-Magnet Levitation System (Magnetic Levitation)
 %  CONTENT   : Automated simulation & comparison of all controllers
 %
-%  CONTROLLERS: PID | SSC | FeedbackLin | Backstepping | SMC | NMPC
+%  CONTROLLERS: PID | SSC | Backstepping | FeedbackLin | SMC | NMPC
 %
 %  WORKFLOW  : 1) Load common parameters (setup_sim_params.m)
 %              2) Load controller parameters (.mat)
@@ -45,8 +45,8 @@ MPC         = '.\03_Nonlinear_MPC\';
 models = {
     struct('folder', LIN, 'model', 'Maglev_PID',             'label', 'PID',          'params', 'LinearControllerData');
     struct('folder', LIN, 'model', 'Maglev_SSC',             'label', 'SSC',          'params', 'LinearControllerData');
-    struct('folder', NLC, 'model', 'Maglev_FeedbackLin',     'label', 'FeedbackLin',  'params', 'NonlinearControllerData');
     struct('folder', NLC, 'model', 'Maglev_Backstepping',    'label', 'Backstepping', 'params', 'NonlinearControllerData');
+    struct('folder', NLC, 'model', 'Maglev_FeedbackLin',     'label', 'FeedbackLin',  'params', 'NonlinearControllerData');
     struct('folder', NLC, 'model', 'Maglev_SMC_mfcn',        'label', 'SMC',          'params', 'NonlinearControllerData');
     struct('folder', MPC, 'model', 'Maglev_NMPC_OffsetFree', 'label', 'NMPC',         'params', 'OffsetFreeNMPCData');
 };
@@ -57,12 +57,12 @@ SIG_ICMD  = 'cmd_current';
 
 % --- Colors (one per controller) ---
 COLORS = [
-    0.56, 0.00, 1.00;   % Violet     — PID
-    0.85, 0.33, 0.10;   % Orange     — SSC
-    0.00, 0.47, 0.44;   % Pine green — FeedbackLin
-    0.82, 0.71, 0.55;   % Tan        — Backstepping
-    0.00, 0.45, 0.74;   % Blue       — SMC
-    0.44, 0.26, 0.08;   % Sepia      — NMPC
+    0.56, 0.00, 1.00;   % Violet     
+    0.85, 0.33, 0.10;   % Orange     
+    0.00, 0.47, 0.44;   % Pine green 
+    0.82, 0.71, 0.55;   % Tan        
+    0.00, 0.45, 0.74;   % Blue       
+    0.44, 0.26, 0.08;   % Sepia      
 ];
 
 LINEWIDTH = 1.6;
