@@ -52,7 +52,7 @@ All window boundaries are expressed as fractions of `T_stp` and `T_sim`, so chan
 
 **Current quality (three metrics, computed over the command current).**
 - *Peak current* — full simulation. Sets the actuator sizing requirement.
-- *RMS current* — full simulation, time-weighted ($\sqrt{\int i^2 dt / T_{\text{sim}}}$, not sample-mean). Drives thermal load.
+- *RMS current* — full simulation, time-weighted ($\sqrt{\tfrac{\int i^2\,dt}{T_{\text{sim}}}}$, not sample-mean). Drives thermal load.
 - *Total Variation (TV)* — $\sum |\Delta i|$ over the first 200 ms of the disturbance window. Captures true controller activity under excitation, separating it from quiescent sensor-noise tracking.
 
 The energy metric is reported **separately** for the transient and disturbance phases rather than as a single total. A controller that uses heavy actuation during startup but recovers passively under disturbance is a structurally different design from one that does the opposite; conflating the two into one number hides the distinction.

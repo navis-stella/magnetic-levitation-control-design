@@ -2,7 +2,7 @@
 
 The script `evaluation_controllers.m` (see [§9](09_evaluation_framework.md)) runs all six EKF-based controllers — PID, SSC, Backstepping, FeedbackLin, SMC, and the offset-free NMPC — against the same Simscape plant, the same EKF, the same reference step (initial air gap 2.5 mm → target 2.0 mm), and the same external disturbance (a –19.6 N step in the gravity direction at $t = 1$ s). The full simulation is run twice: once with the eddy-current measurement noise active (the realistic hardware-deployment scenario) and once with noise deactivated (a structural benchmark that exposes each controller's behavior under ideal sensing).
 
-This dual-scenario evaluation separates two questions that a single-scenario comparison conflates: *what does each controller achieve when given perfect information* (the structural benchmark) and *what does each controller achieve when given the actual measurement signal* (the realistic deployment). For the integral-action controllers the answers are nearly the same; for the offset-free NMPC they reveal an important distinction that §10.4 unpacks.
+This dual-scenario evaluation separates two questions that a single-scenario comparison conflates: *what does each controller achieve when given perfect information* (the structural benchmark) and *what does each controller achieve when given the actual measurement signal* (the realistic deployment). For the integral-action controllers the answers are nearly the same; for the offset-free NMPC they reveal an important distinction that [§10.4](#104-what-the-noise-on--noise-off-comparison-reveals) unpacks.
 
 <div align="center">
   <img src="../02_Control_Design_SingleMagnet_Levitation/Results/TimeResponse_noise_active.png" width="720" alt="Air-gap time response, noise active"/>
@@ -16,7 +16,7 @@ This dual-scenario evaluation separates two questions that a single-scenario com
   <img src="../02_Control_Design_SingleMagnet_Levitation/Results/TimeResponse_noise_deactive.png" width="720" alt="Air-gap time response, noise deactive"/>
 </div>
 
-> **Figure 10.2** — Same controllers, same trajectories, noise removed from the position measurement. Used as the structural-benchmark reference in §10.4.
+> **Figure 10.2** — Same controllers, same trajectories, noise removed from the position measurement. Used as the structural-benchmark reference in [§10.4](#104-what-the-noise-on--noise-off-comparison-reveals).
 
 ## 10.1 Initial Transient
 
@@ -54,7 +54,7 @@ The –19.6 N external force step at $t = 1$ s applies in the gravity direction.
 
 **Within the closed-form group, SMC remains the disturbance-rejection winner.** SMC delivers the lowest peak deviation (70 µm) and the fastest recovery (42.3 ms) among the five closed-form controllers. Combined with sub-µm steady-state precision via the integral-action variant of [§6.8](06_sliding_mode_control.md), this is exactly the practical payoff that the switching-based design promises: the reaching law absorbs the disturbance into the boundary layer rather than waiting for the linear closed-loop dynamics to drive it out. ITAE puts SSC and SMC essentially tied (0.96 / 0.95) — the time-weighted error metric flatters SSC because its disturbance peak, although larger than SMC's, is short-lived.
 
-**The final-SS-error anomaly.** All five closed-form controllers settle at a final steady-state error of roughly 0.6 µm — they cluster tightly between 0.574 (FeedbackLin) and 0.615 (PID). Only NMPC achieves a substantially smaller final error (0.092 µm, 6–7× better). The closed-form group's apparent inability to fully zero the disturbance is a systematic effect, not a controller-tuning issue: §10.4 traces it to a small linearization bias in the EKF that integral action alone cannot correct.
+**The final-SS-error anomaly.** All five closed-form controllers settle at a final steady-state error of roughly 0.6 µm — they cluster tightly between 0.574 (FeedbackLin) and 0.615 (PID). Only NMPC achieves a substantially smaller final error (0.092 µm, 6–7× better). The closed-form group's apparent inability to fully zero the disturbance is a systematic effect, not a controller-tuning issue: [§10.4](#104-what-the-noise-on--noise-off-comparison-reveals) traces it to a small linearization bias in the EKF that integral action alone cannot correct.
 
 ## 10.3 Current Quality
 
@@ -73,7 +73,11 @@ The actuation effort that produces these air-gap responses (disturbance window):
 
 **NMPC's intermediate peak.** NMPC's peak current (6.9 A) lands between PID and the closed-form group. The peak occurs in the initial transient, not the disturbance phase — the OCP plans a more energetic input early on to reach the target without violating the gap constraint, then runs at near-equilibrium current thereafter. The disturbance-window subplot in Figure 10.1 makes this concrete: NMPC's current barely moves during the disturbance event itself.
 
+<<<<<<< HEAD
 **Total Variation under noise.** The Total Variation column is the most counter-intuitive entry in the table: PID has the *lowest* Total Variation under noise, while NMPC has the highest. This reflects what Total Variation actually measures under measurement noise — the sum of fast variations in the command. PID's smoothed derivative path filters high-frequency noise; the state-feedback controllers (SSC, Backstepping, FeedbackLin, SMC) consume the EKF velocity directly and pass more of the noise into the command; NMPC re-solves the OCP every sample with the latest augmented estimate, producing the most variation. **Without noise the picture inverts** — the noise-deactive figure shows NMPC with Total Variation ≈ 0.5 A and PID with Total Variation ≈ 10 A. The Total Variation metric under noise is therefore mostly a measure of how the controller filters the measurement, not how much it truly moves to reject a real disturbance. The peak-deviation and IAE columns in §10.2 are the cleaner indicators of "useful work done."
+=======
+**Total Variation under noise.** The Total Variation column is the most counter-intuitive entry in the table: PID has the *lowest* Total Variation under noise, while NMPC has the highest. This reflects what Total Variation actually measures under measurement noise — the sum of fast variations in the command. PID's smoothed derivative path filters high-frequency noise; the state-feedback controllers (SSC, FBL, Backstepping, SMC) consume the EKF velocity directly and pass more of the noise into the command; NMPC re-solves the OCP every sample with the latest augmented estimate, producing the most variation. **Without noise the picture inverts** — the noise-deactive figure shows NMPC with Total Variation ≈ 0.5 A and PID with Total Variation ≈ 10 A. The Total Variation metric under noise is therefore mostly a measure of how the controller filters the measurement, not how much it truly moves to reject a real disturbance. The peak-deviation and IAE columns in [§10.2](#102-disturbance-rejection) are the cleaner indicators of "useful work done."
+>>>>>>> aec49762cdf5213d2113a22e64ff270ca7c98bcb
 
 **Disturbance energy is essentially equal.** All six controllers spend roughly the same energy rejecting the disturbance ($W_D \in [0.048, 0.053]$ A²·s) despite very different trajectories. This is a useful reality check: the energy needed to *hold* the new equilibrium against the –19.6 N force is set by physics, since the equilibrium current shifts to compensate. The differences between controllers live in *how* each one transitions to that new equilibrium, not in the steady-state cost.
 
@@ -83,7 +87,7 @@ Comparing the two scenarios for each metric exposes which differences are contro
 
 | Behavior | Noise active | Noise deactive | Interpretation |
 |---|---|---|---|
-| Overshoot, rise, settling | as in §10.1 | within 1–2% of §10.1 | Controller-driven, not sensing-driven |
+| Overshoot, rise, settling | as in [§10.1](#101-initial-transient) | within 1–2% of [§10.1](#101-initial-transient) | Controller-driven, not sensing-driven |
 | Closed-form unforced SS-error | ~0.25 µm | ~0.25 µm | **Same in both** — systematic, not noise |
 | NMPC unforced SS-error | 0.126 µm | ≈ 0 | Noise-floor; augmented EKF filters it out cleanly without noise |
 | Closed-form final SS-error | ~0.6 µm | ~0.6 µm | **Same in both** — systematic, not noise |
@@ -98,7 +102,7 @@ This is a subtle but important engineering observation: **integral action is not
 
 ## 10.5 Four Controller Profiles
 
-Pulling §10.1–§10.4 together, the six controllers cluster into four distinct profiles:
+Pulling [§10.1](#101-initial-transient)–[§10.4](#104-what-the-noise-on--noise-off-comparison-reveals) together, the six controllers cluster into four distinct profiles:
 
 - **PID** — fastest rise, worst overshoot, highest actuator stress. The classical SISO trade-off, executed faithfully.
 - **SSC** — most damped among the linear-feedback designs, second-best disturbance rejection in the closed-form group. The clean MIMO-scalable default.
