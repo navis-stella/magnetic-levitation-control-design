@@ -48,4 +48,4 @@ $$
 
 Both $k_x, k_i > 0$, so the open-loop plant has an unstable real pole at $s = +\sqrt{k_x/m} = \sqrt{2g/x_0} \approx 99\,\text{rad/s}$. Active feedback is therefore not a design choice but a stability prerequisite.
 
-This unstable-pole frequency reappears throughout the project as a fundamental bandwidth lower bound: any stabilizing controller must have closed-loop bandwidth exceeding it. The SMC tuning condition $\lambda > \sqrt{2g/x_0}$ in §6 is the most direct example.
+This unstable-pole frequency reappears throughout the project as a fundamental bandwidth lower bound: any stabilizing controller must have closed-loop bandwidth exceeding it. The SMC tuning condition $\lambda > \sqrt{2g/x_0}$ in [§6](06_sliding_mode_control.md) is the most direct example.
