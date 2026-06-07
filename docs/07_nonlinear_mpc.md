@@ -63,7 +63,7 @@ The offset-free formulation (see Pannocchia, 2015, for a tutorial review) extend
 
 ### 7.5.1 Augmented Dynamics
 
-A scalar disturbance state $d$ is introduced on the velocity channel of the §1 dynamics:
+A scalar disturbance state $d$ is introduced on the velocity channel of the [§1](01_system_modeling.md) dynamics:
 
 $$
 \dot{x}_1 = x_2,\qquad \dot{x}_2 = \frac{K_m}{m}\cdot\frac{i_s^2}{(x_0 - x_1)^2} - g + d,\qquad \dot{d} = 0
