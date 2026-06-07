@@ -2,7 +2,7 @@
 
 This is the most complex system in the project: a multi-DOF magnetically levitated sled unit. It serves two purposes simultaneously — to deliver a working controller for an industrially-realistic geometry, and to validate the design recommendation of [§11.3](11_comparative_analysis.md) (state-space control as the practical default for multi-DOF magnetic bearing systems) on a system whose scale would make any of the nonlinear analytical methods prohibitive.
 
-The chapter is organized around four threads: the mechanical configuration ([§13.1](#131-system-description)), the CAD-based multibody modeling workflow ([§13.2](#132-cad-based-multibody-modeling)–[§13.3](#133-frame-and-force-conventions)), the parameter-organization architecture that keeps the model maintainable at this scale ([§13.4](#134-parameter-organization-setup_machine_model)), and the controller and observer design ([§13.5](#135-state-space-controller-and-observer)).
+The chapter is organized around four threads: the mechanical configuration ([§13.1](#131-system-description)), the CAD-based multibody modeling workflow ([§13.2](#132-cad-based-multibody-modeling)–[§13.3](#133-frame-and-force-conventions)), the parameter-organization architecture that keeps the model maintainable at this scale ([§13.4](#134-parameter-organization-setup_machine_model)), and the controller and observer design ([§13.5](#135-state-space-controller-and-observer-controller_design)).
 
 ## 13.1 System Description
 
@@ -19,14 +19,14 @@ The system has **five actively controlled degrees of freedom**:
 - Two translations: $x, y$ (perpendicular to the guideway).
 - Three rotations: $\theta$ (roll), $\phi$ (pitch), $\psi$ (yaw).
 
-The sixth DOF, translation along the guideway direction ($z$), is mechanically constrained and not part of the control problem. The eight electromagnets are therefore **over-actuated** relative to the five controlled DOFs — a redundancy the equilibrium-current allocation ([§13.5](#135-state-space-controller-and-observer), S1) exploits to absorb the asymmetry caused by an offset center of mass.
+The sixth DOF, translation along the guideway direction ($z$), is mechanically constrained and not part of the control problem. The eight electromagnets are therefore **over-actuated** relative to the five controlled DOFs — a redundancy the equilibrium-current allocation ([§13.5](#135-state-space-controller-and-observer-controller_design), S1) exploits to absorb the asymmetry caused by an offset center of mass.
 
 The **geometric center of the sled** is the reference for all kinematic descriptions. Two reference poses define the operating regimes:
 
 - The **equilibrium pose** — sled geometric center aligned with the geometric center of the machine stand, all eight air gaps at their nominal value (0.5 mm). This is the operating point about which the plant is linearized.
 - The **rest pose** — sled physically rests on its supports with the lower air gaps closed to zero. This is the natural initial condition before levitation is activated, and corresponds to a deviation of approximately $0.7$ mm in the $-y$ direction relative to the equilibrium pose (the exact value depends on the CAD geometry and the small roll offset induced by the supports).
 
-The closed-loop evaluation in [§13.6](#136-evaluation-and-results) starts from the **rest pose**. This is a large initial condition — the rest-to-equilibrium step is well beyond the small-signal neighborhood in which the reluctance-force linearization remains accurate — but the controller documented in [§13.5](#135-state-space-controller-and-observer) handles it directly: the augmented Kalman observer estimates the residual force/moment as a generalized disturbance $\hat{d}$, the disturbance-feedforward path cancels it at the input, and the LQR drives the linearized plant state to the equilibrium pose. The closed loop converges to a symmetric air-gap configuration at the nominal 0.5 mm setpoint with no residual error.
+The closed-loop evaluation in [§13.6](#136-evaluation-and-results) starts from the **rest pose**. This is a large initial condition — the rest-to-equilibrium step is well beyond the small-signal neighborhood in which the reluctance-force linearization remains accurate — but the controller documented in [§13.5](#135-state-space-controller-and-observer-controller_design) handles it directly: the augmented Kalman observer estimates the residual force/moment as a generalized disturbance $\hat{d}$, the disturbance-feedforward path cancels it at the input, and the LQR drives the linearized plant state to the equilibrium pose. The closed loop converges to a symmetric air-gap configuration at the nominal 0.5 mm setpoint with no residual error.
 
 In a hardware deployment a **soft-start routine** — a nonlinear open-loop current profile that guides the sled from the supports into a neighborhood of the equilibrium before closed-loop activation — would still be advisable as an actuator-protection measure, since the rest-to-equilibrium transient drives several magnets briefly to their current limit. For the simulation study in this chapter no soft-start is required, and the unaided rest-to-equilibrium transient is reported directly in [§13.6](#136-evaluation-and-results).
 
@@ -134,10 +134,10 @@ The LQR is designed on the unaugmented pair $(A, B)$ with block-diagonal weights
 
 Note that **no integral states are appended to the controller** — offset-free behavior is delivered by the disturbance-feedforward mechanism of S4, not by controller-side integration.
 
-**S4 — Disturbance feedforward.** The augmented observer (S6) provides a five-dimensional estimate $\hat{d} = [\hat{F}_{x}, \hat{F}_{y}, \hat{M}_{\theta}, \hat{M}_{\phi}, \hat{M}_{\psi}]^\top$ of the residual generalized force/moment acting on the sled. At steady state ($\mathbf{q} = 0$, $\dot{\mathbf{q}} = 0$) the velocity equation requires
+**S4 — Disturbance feedforward.** The augmented observer (S6) provides a five-dimensional estimate $\hat{d} = [\hat{F}\_x, \hat{F}\_y, \hat{M}\_\theta, \hat{M}\_\phi, \hat{M}\_\psi]^\top$ of the residual generalized force/moment acting on the sled. At steady state ($\mathbf{q} = 0$, $\dot{\mathbf{q}} = 0$) the velocity equation requires
 
 $$
-0 = K_i  \mathbf{u}_\text{ss} + \hat{d} \quad\Longrightarrow\quad \mathbf{u}_\text{ss} = -K_i^{\dagger}  \hat{d}
+0 = K_i  \mathbf{u}\_\text{ss} + \hat{d} \quad\Longrightarrow\quad \mathbf{u}_\text{ss} = -K_i^{\dagger}  \hat{d}
 $$
 
 where $K_i^\dagger = (K_i^\top K_i)^{-1} K_i^\top$ is the Moore–Penrose pseudoinverse (the over-actuated case is handled by selecting the minimum-norm current vector consistent with cancelling $\hat{d}$). Defining the feedforward gain $K_{d,\text{ff}} = K_i^\dagger$ and combining with the LQR gives the full control law:
