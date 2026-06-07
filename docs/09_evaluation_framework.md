@@ -1,6 +1,6 @@
 # 9. Evaluation Framework
 
-The script `evaluation_controllers.m` is the single entry point for comparing the six EKF-based controllers under identical conditions: PID, SSC, FeedbackLin, Backstepping, SMC, and the offset-free NMPC. It runs every model headlessly, collects the same set of signals from each, computes a fixed set of metrics, and produces a bundle of figures and raw data in the `Results/` folder.
+The script `evaluation_controllers.m` is the single entry point for comparing the six EKF-based controllers under identical conditions: PID, SSC, Backstepping, FeedbackLin, SMC, and the offset-free NMPC. It runs every model headlessly, collects the same set of signals from each, computes a fixed set of metrics, and produces a bundle of figures and raw data in the `Results/` folder.
 
 ## 9.1 What It Does
 
