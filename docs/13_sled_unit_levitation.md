@@ -1,4 +1,4 @@
-# 13. Sled Unit Levitation
+# 13. Sled-Unit Levitation
 
 This is the most complex system in the project: a multi-DOF magnetically levitated sled unit. It serves two purposes simultaneously — to deliver a working controller for an industrially-realistic geometry, and to validate the design recommendation of [§11.3](11_comparative_analysis.md) (state-space control as the practical default for multi-DOF magnetic bearing systems) on a system whose scale would make any of the nonlinear analytical methods prohibitive.
 
