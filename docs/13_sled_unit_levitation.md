@@ -204,15 +204,15 @@ The script `evaluation_sled_levitation.m` executes `SledUnit_Levitation_Control.
 
 ### 13.6.1 Test Configuration
 
-Each simulation runs for $T_\text{sim} = 1\,\text{s}$, starting from the **rest pose** (lower air gaps closed to zero, $y$-deviation $\approx -0.7$ mm). At $t = 0.5\,\text{s}$ a constant external disturbance is applied at the **sled tip frame** — not at the geometric center — so that the applied forces also induce moments about the controlled axes:
+Each simulation runs for $T_\text{sim} = 1 \text{s}$, starting from the **rest pose** (lower air gaps closed to zero, $y$-deviation $\approx -0.7$ mm). At $t = 0.5 \text{s}$ a constant external disturbance is applied at the **sled tip frame** — not at the geometric center — so that the applied forces also induce moments about the controlled axes:
 
 <div align="center">
 
 | Channel | Value | Status |
 |---|---|---|
-| $F_x$ step | $-1200\,\text{N}$ at $t = 0.5\,\text{s}$ | applied |
-| $F_y$ step | $+800\,\text{N}$ at $t = 0.5\,\text{s}$ | applied |
-| $T_z$ step | $+1000\,\text{N}\!\cdot\!\text{m}$ | configured but not exercised |
+| $F_x$ step | $-1200 \text{N}$ at $t = 0.5 \text{s}$ | applied |
+| $F_y$ step | $+800 \text{N}$ at $t = 0.5 \text{s}$ | applied |
+| $T_z$ step | $+1000 \text{N}\cdot\text{m}$ at $t = 0.5 \text{s}$ | configured but not exercised |
 
 </div>
 
@@ -258,7 +258,7 @@ The noise-off rest-to-equilibrium response (figures `sled_pose_translation_noise
 
 ### 13.6.3 Disturbance Rejection
 
-A constant $F_x = -1200\,\text{N}$, $F_y = +800\,\text{N}$ step is applied at the sled tip frame at $t = 0.5\,\text{s}$. Because the tip is offset from the sled's geometric center, the applied forces also generate moments about all three rotational axes, so a single step input exercises every controlled DOF simultaneously. The response is shown in the disturbance-window insets (bottom-right panels) of Figures 13.2 and 13.3.
+A constant $F_x = -1200 \text{N}$, $F_y = +800 \text{N}$ step is applied at the sled tip frame at $t = 0.5 \text{s}$. Because the tip is offset from the sled's geometric center, the applied forces also generate moments about all three rotational axes, so a single step input exercises every controlled DOF simultaneously. The response is shown in the disturbance-window insets (bottom-right panels) of Figures 13.2 and 13.3.
 
 The peak excursions following the step are small in absolute terms and consistent in structure across the noise scenarios:
 
@@ -318,7 +318,7 @@ The air-gap row is the decisive evidence. **Without measurement noise, the final
 
 > **Figure 13.8** — Air-gap performance metrics, noise off. The Final SS-Error subplot (bottom-right) reaches the $10^{-7}$ µm scale — machine precision — across all 8 magnets, validating the offset-free property.
 
-The pose final SS-error row is less clean: at the end of the 1 s simulation horizon (0.5 s after disturbance onset) the pose trajectory has not yet asymptoted. The same observer-pole time constant that sets the recovery tail also caps how close the pose can get to zero in finite time, and the residual at $t = 1\,\text{s}$ (a few hundredths of a micrometre) is what the trajectory looks like at $\approx 5$ time constants. Running a longer simulation would bring the pose residual down toward the air-gap-level precision; the air-gap residual reaches that floor earlier because the eight sensor channels are dominated by the fast-converging plant-state component of the observer, while the pose extraction further compounds the slow disturbance-tracking dynamics.
+The pose final SS-error row is less clean: at the end of the 1 s simulation horizon (0.5 s after disturbance onset) the pose trajectory has not yet asymptoted. The same observer-pole time constant that sets the recovery tail also caps how close the pose can get to zero in finite time, and the residual at $t = 1 \text{s}$ (a few hundredths of a micrometre) is what the trajectory looks like at $\approx 5$ time constants. Running a longer simulation would bring the pose residual down toward the air-gap-level precision; the air-gap residual reaches that floor earlier because the eight sensor channels are dominated by the fast-converging plant-state component of the observer, while the pose extraction further compounds the slow disturbance-tracking dynamics.
 
 <div align="center">
   <img src="../04_Control_Design_SledUnit_Levitation/Results/pose_metrics_noise_off.png" width="720" alt="Pose metrics, noise off"/>
