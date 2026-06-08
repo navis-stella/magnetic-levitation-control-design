@@ -228,7 +228,7 @@ The first 100 ms of the simulation contain the entire rest-to-equilibrium transi
   <img src="../04_Control_Design_SledUnit_Levitation/Results/sled_pose_translation_noise_on.png" width="720" alt="Sled translational deviation, noise on"/>
 </div>
 
-> **Figure 13.2** — Sled-unit translational deviation $p_x$, $p_y$ over the full 1 s simulation (noise on). The bottom-left inset zooms into the init transient (0–100 ms); the bottom-right inset zooms into the disturbance window (≈ 0.5–0.6 s).
+> **Figure 13.2** — Sled-unit translational deviation $px$, $py$ over the full 1 s simulation (noise on). The bottom-left inset zooms into the init transient (0–100 ms); the bottom-right inset zooms into the disturbance window (≈ 0.5–0.6 s).
 
 <div align="center">
   <img src="../04_Control_Design_SledUnit_Levitation/Results/sled_pose_rotation_noise_on.png" width="720" alt="Sled rotational deviation, noise on"/>
