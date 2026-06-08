@@ -28,9 +28,10 @@ noise_switch = 1;
 % Timestamps
 T_dist = 0.5 * T_sim;   % Common disturbance onset time          [s]
 % Amplitudes
-Fx_amp = -900;           % Disturbance force X                   [N]
+Fx_amp = -1200;          % Disturbance force X                   [N]
 Fy_amp = 800;            % Disturbance force Y                   [N]
 Tz_amp = 1000;           % Disturbance torque Z                  [N·m]
+
 %-----------------------------------------------------------------
 % Format: [time, value] — duplicate timestamp → ideal step
 %-----------------------------------------------------------------

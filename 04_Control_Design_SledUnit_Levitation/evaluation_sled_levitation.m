@@ -7,31 +7,32 @@
 %#  without the Simulink GUI.                                            #%
 %#                                                                       #%
 %#  DISTURBANCE:                                                         #%
-%#    At t = 0.5*T_sim a CONSTANT disturbance force along x and y       #%
+%#    At t = 0.5*T_sim a CONSTANT disturbance force along x and y        #%
 %#    is applied (F_x, F_y).                                             #%
 %#                                                                       #%
 %#  PLOT STRATEGY:                                                       #%
 %#    • Air gap and command current: one figure per signal group with    #%
-%#      the full profile as the main plot and two embedded zoom          #%
+%#      the full time history as the main plot and two embedded zoom     #%
 %#      insets (init transient and disturbance response). The zoom       #%
 %#      regions are marked on the main plot with red rectangles;         #%
 %#      arrows connect each rectangle to its corresponding inset.        #%
-%#    • Sled pose: three separate figures (full / init / dist),          #%
-%#      since five DOFs are displayed side by side. Units are mm         #%
-%#      (translational) and mrad (rotational).                           #%
+%#    • Sled pose: two figures (translation px/py [mm];                  #%
+%#      rotation roll/pitch/yaw [mrad]). Layout per figure as for the    #%
+%#      air gap — main plot + init inset + dist inset; no zoom           #%
+%#      rectangles, but with a legend in each inset.                     #%
 %#                                                                       #%
 %#                                                                       #%
 %#  OUTPUTS (saved to Results/):                                         #%
-%#    Time series:                                                        #%
-%#      - airgap_noise_*.png             main plot + 4 insets            #%
+%#    Time series:                                                       #%
+%#      - airgap_noise_*.png             main plot + 2 insets            #%
 %#      - current_noise_*.png            main plot + 2 insets            #%
-%#      - sled_pose_{full,init,dist}_noise_*.png  (mm/mrad units)        #%
-%#    Metrics:                                                            #%
-%#      - pose_metrics_trans_noise_*.png                                 #%
-%#      - pose_metrics_rot_noise_*.png                                   #%
+%#      - sled_pose_translation_noise_*.png    (px, py)                  #%
+%#      - sled_pose_rotation_noise_*.png       (roll, pitch, yaw)        #%
+%#    Metrics:                                                           #%
+%#      - pose_metrics_noise_*.png                                       #%
 %#      - airgap_metrics_noise_*.png                                     #%
 %#      - current_metrics_noise_*.png                                    #%
-%#    Data:                                                               #%
+%#    Data:                                                              #%
 %#      - simulation_results_noise_*.mat                                 #%
 %#                                                                       #%
 %#########################################################################%
@@ -39,7 +40,7 @@
 clc; clear; close all;
 
 
-%% 1 — Simulation Configuration
+%% 1 — Simulation configuration
 setup_sim_params;
 
 % --- Time windows for metric evaluation ---------------------------------
@@ -51,14 +52,14 @@ t_tv_end         = min(t_dist_start + 0.20, T_sim);               % TV window (2
 % --- Zoom windows for figures -------------------------------------------
 t_init_end       = 0.10;                                          % init zoom up to 100 ms
 t_dist_zoom_pre  = 0.005;                                         % 5 ms before disturbance
-t_dist_zoom_post = 0.080;                                         % 80 ms after disturbance
+t_dist_zoom_post = 0.10;                                          % 100 ms after disturbance
 t_dist_win_start = max(t_dist_start - t_dist_zoom_pre, 0);
 t_dist_win_end   = min(t_dist_start + t_dist_zoom_post, T_sim);
 
 % --- Tolerance bands ----------------------------------------------------
 band_pct_ag       = 0.02;          % ±2 % of setpoint for settling time
 band_pct_rec      = 0.05;          % 5 % of peak for recovery time
-band_um_rec_floor = 0.3;           % absolute lower bound 0.3 µm
+band_um_rec_floor = 0.3;           % absolute lower limit 0.3 µm
 
 % --- Output -------------------------------------------------------------
 results_dir = 'Results';
@@ -70,10 +71,11 @@ fig_position   = [50, 50, 1400, 800];
 zmbox_color    = [1.00, 0.27, 0.00]; 
 zmtitle_color  = [0.00, 0.00, 1.00];
 zmplot_color   = [0, 0, 0];
+dist_label = sprintf('Const. F_x, F_y @ %.2f s', t_dist_start);
 
-%% 2 — Run Simulation (Headless, no GUI)
+%% 2 — Run simulation (headless, no GUI)
 noise_labels = {"off", "on"};
-fprintf('Starting simulation (T = %.1f s, Noise = %s) ...\n', ...
+fprintf('Starting simulation (T = %.1f s, noise = %s) ...\n', ...
         T_sim, noise_labels{noise_switch + 1});
 noise_tag = 'noise_' + noise_labels{noise_switch + 1};
 
@@ -89,7 +91,7 @@ simOut = sim('SledUnit_Levitation_Control.slx', ...
 fprintf('Simulation completed successfully.\n\n');
 
 
-%% 3 — Extract Signals from Logging Data
+%% 3 — Extract signals from logged data
 time = simOut.tout;
 N    = numel(time);
 to_NxC = @(X) reshape(X, N, []);
@@ -98,14 +100,14 @@ Is_cmd      = to_NxC(simOut.logsout.get("u_cmd").Values.Data);
 I_act_raw   = to_NxC(simOut.logsout.get("act_curVals").Values.Data);
 meas_ag_raw = to_NxC(simOut.logsout.get("meas_airgap").Values.Data);
 
-slu_x     = to_NxC(simOut.logsout.get("px").Values.Data);
-slu_y     = to_NxC(simOut.logsout.get("py").Values.Data);
+slu_px    = to_NxC(simOut.logsout.get("px").Values.Data);
+slu_py    = to_NxC(simOut.logsout.get("py").Values.Data);
 slu_roll  = to_NxC(simOut.logsout.get("roll").Values.Data);
 slu_pitch = to_NxC(simOut.logsout.get("pitch").Values.Data);
 slu_yaw   = to_NxC(simOut.logsout.get("yaw").Values.Data);
 
 
-%% 4 — Reorder Sensor Signals to elMaglabels Convention
+%% 4 — Reorder sensor signals to elMaglabels convention
 % Sensor order:   SLO=1, SRO=2, ELO=3, ERO=4, SLU=5, SRU=6, ELU=7, ERU=8
 % Target order:   ELO=1, ELU=2, ERO=3, ERU=4, SLO=5, SLU=6, SRO=7, SRU=8
 reorder = [3, 7, 4, 8, 1, 5, 2, 6];
@@ -117,7 +119,7 @@ idx_up = [1, 3, 5, 7];   % upper magnets: ELO, ERO, SLO, SRO
 idx_lw = [2, 4, 6, 8];   % lower magnets: ELU, ERU, SLU, SRU
 
 
-%% 5 — Equilibrium Current per Magnet (for Excess Energy)
+%% 5 — Equilibrium current per magnet (for excess energy)
 mask_eq = (time >= t_pre_ss_start) & (time < t_dist_start);
 if isfield(ssc_params, 'nom_curvec') && numel(ssc_params.nom_curvec) == 8
     i_eq_vec    = ssc_params.nom_curvec(:).';
@@ -141,10 +143,10 @@ if max(mismatch) > 0.05
 end
 
 
-%% 6 — Performance Criteria: Pose (5 DOF)
-%  Scaling for display: m → µm, rad → µrad.
-pose_data           = {slu_x, slu_y, slu_roll, slu_pitch, slu_yaw};
-pose_labels         = {'x', 'y', 'Roll', 'Pitch', 'Yaw'};
+%% 6 — Performance criteria: pose (5 DOF)
+%  Display scaling: m → µm, rad → µrad.
+pose_data           = {slu_px, slu_py, slu_roll, slu_pitch, slu_yaw};
+pose_labels         = {'px', 'py', 'Roll', 'Pitch', 'Yaw'};
 pose_metric_units   = {'µm', 'µm', 'µrad', 'µrad', 'µrad'};
 pose_metric_scale   = [1e6, 1e6, 1e6, 1e6, 1e6];  % m → µm, rad → µrad
 idx_trans           = [1, 2];
@@ -160,7 +162,7 @@ mask_final_ss = time >= t_final_ss_start;
 t_dwin        = time(mask_dwin);
 
 fprintf('\n%s\n', repmat('-', 1, 90));
-fprintf('  POSE PERFORMANCE CRITERIA  (target value 0 for all DOFs)\n');
+fprintf('  POSE PERFORMANCE CRITERIA  (target 0 for all DOFs)\n');
 fprintf('%s\n', repmat('-', 1, 90));
 fprintf('  %-10s │ %12s %14s %12s %14s %12s\n', ...
         'DOF', 'PeakTrans', 'unfSS', 'PeakDist', 'IAE', 'finalSS');
@@ -192,12 +194,12 @@ for d = 1:n_dof
 end
 fprintf('%s\n', repmat('-', 1, 90));
 
-% --- Diagnostic: unexcited DOFs in pre-disturbance phase ----------------
+% --- Diagnosis: unexcited DOFs in pre-disturbance phase -----------------
 % A symmetric initialization does not excite certain DOFs (typically x,
-% Pitch, Yaw) — peak_transient then sits at numerical noise (~1e-4 µm).
-% This is physically correct, not an algorithm error.
+% Pitch, Yaw) — peak_transient then lies at the numerical noise floor
+% (~1e-4 µm). This is physically correct, not an algorithm error.
 noise_floor_thr = 1e-3;       % below 1 nm or 1 nrad => numerical noise
-fprintf('\n  DIAGNOSTIC Pre-Disturbance Excitation:\n');
+fprintf('\n  DIAGNOSIS pre-disturbance excitation:\n');
 any_quiet = false;
 for d = 1:n_dof
     if pose.peak_transient(d) < noise_floor_thr
@@ -213,7 +215,7 @@ if ~any_quiet
 end
 
 
-%% 7 — Performance Criteria: Air Gaps (8 Magnets)
+%% 7 — Performance criteria: air gaps (8 magnets)
 target_ag = ssc_params.nom_airgap;                  % [mm]
 band_ag   = band_pct_ag * target_ag;                % [mm]  — settling band
 
@@ -254,10 +256,10 @@ for m = 1:8
     % Disturbance peak
     ag_perf.peak_dist(m) = max(abs(err_dwin)) * 1e3;                 % µm
 
-    % Recovery time with adaptive band -----------------------------------
-    % BUGFIX vs. original version: the previous band
-    % (±2 % of setpoint = 10 µm) was larger than every peak (< 10 µm),
-    % causing t_rec to always be 0. Adaptive band resolves this.
+    % Recovery time with adaptive band ----------------------------------
+    % BUGFIX vs. original version: the earlier band (±2 % of setpoint
+    % = 10 µm) exceeded every peak (< 10 µm), causing t_rec to always
+    % be 0. The adaptive band resolves this.
     err_um_dwin   = abs(err_dwin) * 1e3;                              % µm
     rec_band_um   = max(band_pct_rec * ag_perf.peak_dist(m), band_um_rec_floor);
     ag_perf.rec_band(m) = rec_band_um;
@@ -288,7 +290,7 @@ end
 fprintf('%s\n', repmat('-', 1, 120));
 
 
-%% 8 — Performance Criteria: Current Quality (8 Magnets)
+%% 8 — Performance criteria: current quality (8 magnets)
 cur_perf = struct('label', {elMaglabels});
 
 fprintf('\n%s\n', repmat('-', 1, 100));
@@ -338,173 +340,198 @@ end
 fprintf('%s\n', repmat('-', 1, 100));
 
 
-%% 9 — Auxiliary Variables for Figures
-dist_label = sprintf('Const. F_x, F_y @ %.2f s', t_dist_start);
+%% 9 — Figure: air gap profiles with zoom insets
+%  Layout: two rows × two columns
+%    Row 1 : main plot with upper AND lower magnets (spanning both columns)
+%    Row 2 : init inset (left) | dist inset (right) — each with both groups
 
-% Plot views for the pose (three separate figures: full / init / dist).
-% Air gap and command current use main plot + insets instead.
-views(1).tag       = 'full';
-views(1).xlim      = [];
-views(1).label     = 'Full Profile';
-views(1).show_dist = true;
-
-views(2).tag       = 'init';
-views(2).xlim      = [0, t_init_end];
-views(2).label     = sprintf('Initialization Transient (0 \\rightarrow %.2f s)', t_init_end);
-views(2).show_dist = false;
-
-views(3).tag       = 'dist';
-views(3).xlim      = [t_dist_win_start, t_dist_win_end];
-views(3).label     = sprintf('Disturbance Response (%.3f \\rightarrow %.3f s)', ...
-                             t_dist_win_start, t_dist_win_end);
-views(3).show_dist = true;
-
-
-%% 10 — Figure: Air Gap Profiles with Zoom Insets
-%  Layout: four rows × two columns
-%    Row 1 : upper main plot  (spanning both columns)
-%    Row 2 : init inset (left) | dist inset (right) for upper magnets
-%    Row 3 : lower main plot  (spanning both columns)
-%    Row 4 : init inset (left) | dist inset (right) for lower magnets
-
-fig_airgap = figure('Name', 'Air Gap with Insets', 'Position', [80, 80, 1500, 1100]);
-tlay_ag = tiledlayout(fig_airgap, 4, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
+fig_airgap = figure('Name', 'Air Gap with Insets', 'Position', [80, 80, 1500, 750]);
+tlay_ag = tiledlayout(fig_airgap, 2, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
 
 magnet_groups = {idx_up, idx_lw};
 group_styles  = {'-', '--'};
-group_titles  = {'Upper Magnets (ELO, ERO, SLO, SRO)', ...
-                 'Lower Magnets (ELU, ERU, SLU, SRU)'};
 
-ax_main_ag = cell(2, 1);
-ax_init_ag = cell(2, 1);
-ax_dist_ag = cell(2, 1);
-
+% --- Main plot (full width) — both groups combined ---
+ax_main_ag = nexttile(tlay_ag, [1 2]);
+hold on;
+h_lines = gobjects(0);
 for g = 1:2
+    h_lines = [h_lines; ...
+        plot(time, meas_ag(:, magnet_groups{g}), group_styles{g}, 'LineWidth', 1.2)];
+end
+yline(target_ag, 'k-.', 'Setpoint', 'LineWidth', 0.8, ...
+      'LabelHorizontalAlignment', 'right','HandleVisibility', 'off');
+xline(t_dist_start, 'k--', 'Label', dist_label, ...
+      'LineWidth', 1.0, 'LabelOrientation', 'horizontal', ...
+      'LabelHorizontalAlignment', 'right', ...
+      'LabelVerticalAlignment', 'top', ...
+      'HandleVisibility', 'off');
+hold off;
+grid on;
+ylabel('Air Gap [mm]');
+xlabel('Time [s]');
+legend(h_lines, elMaglabels([magnet_groups{1}, magnet_groups{2}]), ...
+       'Location', 'northeast', 'FontSize', 8, 'NumColumns', 2);
+title('Air Gap Profiles — Upper (solid) and Lower (dashed) Magnets');
+
+% --- Inset: init transient (both groups) ---
+ax_init_ag = nexttile(tlay_ag);
+hold on;
+for g = 1:2
+    plot(time, meas_ag(:, magnet_groups{g}), group_styles{g}, 'LineWidth', 1.0);
+end
+yline(target_ag, 'k-.', 'LineWidth', 0.5,'HandleVisibility', 'off');
+hold off;
+xlim([0, t_init_end]);
+grid on; box on;
+set(gca, 'XColor', zmplot_color, 'YColor', zmplot_color, 'LineWidth', 1.2);
+title('Init Transient', 'FontSize', 9, 'Color', zmtitle_color);
+ylabel('Air Gap [mm]', 'FontSize', 9);
+xlabel('Time [s]', 'FontSize', 9);
+
+% --- Inset: disturbance response (both groups) ---
+ax_dist_ag = nexttile(tlay_ag);
+hold on;
+for g = 1:2
+    plot(time, meas_ag(:, magnet_groups{g}), group_styles{g}, 'LineWidth', 1.0);
+end
+yline(target_ag, 'k-.', 'LineWidth', 0.5,'HandleVisibility', 'off');
+xline(t_dist_start, 'k--', 'LineWidth', 0.5,'HandleVisibility', 'off');
+hold off;
+xlim([t_dist_win_start, t_dist_win_end]);
+grid on; box on;
+set(gca, 'XColor', zmplot_color, 'YColor', zmplot_color, 'LineWidth', 1.2);
+title('Disturbance Response', 'FontSize', 9, 'Color', zmtitle_color);
+xlabel('Time [s]', 'FontSize', 9);
+
+title(tlay_ag, 'Air Gap Profiles with Zoom Insets', 'FontWeight', 'bold');
+
+% --- Draw rectangles on main plot + arrows to insets -------------------
+drawnow;   % let MATLAB compute layout positions
+
+ax = ax_main_ag;
+yl = ax.YLim;
+
+% Zoom-region rectangles (data coordinates)
+rectangle(ax, 'Position', [0, yl(1), t_init_end, diff(yl)], ...
+          'EdgeColor', zmbox_color, 'LineWidth', 1.5, 'LineStyle','-');
+rectangle(ax, 'Position', [t_dist_win_start, yl(1), ...
+                            t_dist_win_end - t_dist_win_start, diff(yl)], ...
+          'EdgeColor', zmbox_color, 'LineWidth', 1.5, 'LineStyle','-');
+
+% Arrows: from the bottom edge of the rectangle to the top edge of the inset
+pos_main = ax.Position;
+pos_init = ax_init_ag.Position;
+pos_dist = ax_dist_ag.Position;
+
+% --- Init arrow ---
+xl_main = ax.XLim;
+x_src_n = pos_main(1) + (t_init_end/2 - xl_main(1)) / diff(xl_main) * pos_main(3);
+y_src_n = pos_main(2);                              % bottom edge of main plot
+x_dst_n = pos_init(1) + 0.5 * pos_init(3);
+y_dst_n = pos_init(2) + pos_init(4);                % top edge of inset
+annotation(fig_airgap, 'arrow', [x_src_n x_dst_n], [y_src_n y_dst_n], ...
+           'Color', zmbox_color, 'LineWidth', 1.2, 'HeadWidth', 8);
+
+% --- Dist arrow ---
+x_src_n = pos_main(1) + ((t_dist_win_start + t_dist_win_end)/2 - xl_main(1)) ...
+          / diff(xl_main) * pos_main(3);
+y_src_n = pos_main(2);
+x_dst_n = pos_dist(1) + 0.5 * pos_dist(3);
+y_dst_n = pos_dist(2) + pos_dist(4);
+annotation(fig_airgap, 'arrow', [x_src_n x_dst_n], [y_src_n y_dst_n], ...
+           'Color', zmbox_color, 'LineWidth', 1.2, 'HeadWidth', 8);
+
+print(fig_airgap, fullfile(results_dir, sprintf('airgap_%s', noise_tag)), ...
+      fig_format, fig_dpi);
+
+
+%% 10 — Figure: sled-unit pose (translation + rotation separately)
+%  Translational deviation (px, py) in one plot [mm],
+%  Rotational deviation (roll, pitch, yaw) in one plot [mrad].
+%  Layout per figure:
+%    Row 1 : main plot with all components (spanning both columns)
+%    Row 2 : init inset (left) | dist inset (right)
+%  Scaling: position m → mm × 1e3, angle rad → mrad × 1e3.
+
+pose_groups(1).tag     = 'translation';
+pose_groups(1).title   = 'Sled-Unit Translational Deviation';
+pose_groups(1).ylabel  = 'Deviation [mm]';
+pose_groups(1).signals = {slu_px*1e3, slu_py*1e3};
+pose_groups(1).labels  = {'px', 'py'};
+pose_groups(1).colors  = {'b', '#A2142F'};
+
+pose_groups(2).tag     = 'rotation';
+pose_groups(2).title   = 'Sled-Unit Rotational Deviation';
+pose_groups(2).ylabel  = 'Deviation [mrad]';
+pose_groups(2).signals = {slu_roll*1e3, slu_pitch*1e3, slu_yaw*1e3};
+pose_groups(2).labels  = {'Roll', 'Pitch', 'Yaw'};
+pose_groups(2).colors  = {'m', '#0072BD', '#7E2F8E'};
+
+for k = 1:numel(pose_groups)
+    grp = pose_groups(k);
+    fig = figure('Name', grp.title, 'Position', [80, 80, 1500, 750]);
+    tlay = tiledlayout(fig, 2, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
+
     % --- Main plot (full width) ---
-    ax_main_ag{g} = nexttile(tlay_ag, [1 2]);
+    ax_main = nexttile(tlay, [1 2]);
     hold on;
-    plot(time, meas_ag(:, magnet_groups{g}), group_styles{g}, 'LineWidth', 1.2);
-    yline(target_ag, 'k-.', 'Setpoint', 'LineWidth', 0.8, ...
-          'LabelHorizontalAlignment', 'right');
-    xline(t_dist_start, 'b--', 'Label', dist_label, ...
+    h_lines = gobjects(numel(grp.signals), 1);
+    for d = 1:numel(grp.signals)
+        h_lines(d) = plot(time, grp.signals{d}, ...
+                          'Color', grp.colors{d}, 'LineWidth', 1.2);
+    end
+    yline(0, 'k-.', 'LineWidth', 0.6, 'HandleVisibility', 'off');
+    xline(t_dist_start, 'k--', 'Label', dist_label, ...
           'LineWidth', 1.0, 'LabelOrientation', 'horizontal', ...
           'LabelHorizontalAlignment', 'right', ...
           'LabelVerticalAlignment', 'top', ...
           'HandleVisibility', 'off');
     hold off;
     grid on;
-    ylabel('Air Gap [mm]');
-    if g == 2, xlabel('Time [s]'); end
-    legend(elMaglabels(magnet_groups{g}), 'Location', 'east');
-    title(group_titles{g});
+    ylabel(grp.ylabel);
+    xlabel('Time [s]');
+    legend(h_lines, grp.labels, 'Location', 'best');
+    title(grp.title);
 
-    % --- Inset: Init Transient ---
-    ax_init_ag{g} = nexttile(tlay_ag);
+    % --- Inset: init transient ---
+    ax_init = nexttile(tlay);
     hold on;
-    plot(time, meas_ag(:, magnet_groups{g}), group_styles{g}, 'LineWidth', 1.0);
-    yline(target_ag, 'k-.', 'LineWidth', 0.5);
+    for d = 1:numel(grp.signals)
+        plot(time, grp.signals{d}, 'Color', grp.colors{d}, 'LineWidth', 1.0);
+    end
+    yline(0, 'k-.', 'LineWidth', 0.5, 'HandleVisibility', 'off');
     hold off;
     xlim([0, t_init_end]);
     grid on; box on;
-    set(gca, 'XColor', zmplot_color, 'YColor', zmplot_color, 'LineWidth', 1.2);
-    title('Init Transient', 'FontSize', 9, 'Color', zmtitle_color);
-    ylabel('Air Gap [mm]', 'FontSize', 9);
-    if g == 2, xlabel('Time [s]', 'FontSize', 9); end
+    legend(grp.labels, 'Location', 'best', 'FontSize', 8); 
+    title('Init Transient', 'FontSize', 9, 'Color',zmtitle_color);
+    ylabel(grp.ylabel, 'FontSize', 9);
+    xlabel('Time [s]', 'FontSize', 9);
 
-    % --- Inset: Disturbance Response ---
-    ax_dist_ag{g} = nexttile(tlay_ag);
+    % --- Inset: disturbance response ---
+    ax_dist = nexttile(tlay);
     hold on;
-    plot(time, meas_ag(:, magnet_groups{g}), group_styles{g}, 'LineWidth', 1.0);
-    yline(target_ag, 'k-.', 'LineWidth', 0.5);
-    xline(t_dist_start, 'b--', 'LineWidth', 0.5);
+    for d = 1:numel(grp.signals)
+        plot(time, grp.signals{d}, 'Color', grp.colors{d}, 'LineWidth', 1.0);
+    end
+    yline(0, 'k-.', 'LineWidth', 0.5, 'HandleVisibility', 'off');
+    xline(t_dist_start, 'k--', 'LineWidth', 0.5, 'HandleVisibility', 'off');
     hold off;
     xlim([t_dist_win_start, t_dist_win_end]);
     grid on; box on;
-    set(gca, 'XColor', zmplot_color, 'YColor', zmplot_color, 'LineWidth', 1.2);
-    title('Disturbance Response', 'FontSize', 9, 'Color', zmtitle_color);
-    if g == 2, xlabel('Time [s]', 'FontSize', 9); end
-end
+    legend(grp.labels, 'Location', 'best', 'FontSize', 8); 
+    title('Disturbance Response', 'FontSize', 9, 'Color',zmtitle_color);
+    xlabel('Time [s]', 'FontSize', 9);
 
-title(tlay_ag, 'Air Gap Profiles with Zoom Insets', 'FontWeight', 'bold');
-
-% --- Draw rectangles on main plots + arrows to insets -------------------
-drawnow;   % let the layout engine resolve positions
-
-for g = 1:2
-    ax = ax_main_ag{g};
-    yl = ax.YLim;
-
-    % Zoom-region rectangles (data coordinates)
-    rectangle(ax, 'Position', [0, yl(1), t_init_end, diff(yl)], ...
-              'EdgeColor', zmbox_color, 'LineWidth', 1.5, 'LineStyle','-');
-    rectangle(ax, 'Position', [t_dist_win_start, yl(1), ...
-                                t_dist_win_end - t_dist_win_start, diff(yl)], ...
-              'EdgeColor', zmbox_color, 'LineWidth', 1.5, 'LineStyle','-');
-
-    % Arrows: from the bottom edge of the rectangle to the top edge of the inset
-    pos_main = ax.Position;
-    pos_init = ax_init_ag{g}.Position;
-    pos_dist = ax_dist_ag{g}.Position;
-
-    % --- Init arrow ---
-    xl_main = ax.XLim;
-    x_src_n = pos_main(1) + (t_init_end/2 - xl_main(1)) / diff(xl_main) * pos_main(3);
-    y_src_n = pos_main(2);                              % bottom edge of main plot
-    x_dst_n = pos_init(1) + 0.5 * pos_init(3);
-    y_dst_n = pos_init(2) + pos_init(4);                % top edge of inset
-    annotation(fig_airgap, 'arrow', [x_src_n x_dst_n], [y_src_n y_dst_n], ...
-               'Color', zmbox_color, 'LineWidth', 1.2, 'HeadWidth', 8);
-
-    % --- Dist arrow ---
-    x_src_n = pos_main(1) + ((t_dist_win_start + t_dist_win_end)/2 - xl_main(1)) ...
-              / diff(xl_main) * pos_main(3);
-    y_src_n = pos_main(2);
-    x_dst_n = pos_dist(1) + 0.5 * pos_dist(3);
-    y_dst_n = pos_dist(2) + pos_dist(4);
-    annotation(fig_airgap, 'arrow', [x_src_n x_dst_n], [y_src_n y_dst_n], ...
-               'Color', zmbox_color, 'LineWidth', 1.2, 'HeadWidth', 8);
-end
-
-print(fig_airgap, fullfile(results_dir, sprintf('airgap_%s', noise_tag)), ...
-      fig_format, fig_dpi);
-
-
-%% 11 — Figure: Sled Unit Pose (3 views, mm / mrad)
-%  Sled pose is displayed in mm (x, y) and mrad (Roll, Pitch, Yaw).
-%  Scaling: position m → mm × 1e3, angle rad → mrad × 1e3.
-pose_signals_plot = {slu_x*1e3, slu_y*1e3, slu_roll*1e3, slu_pitch*1e3, slu_yaw*1e3};
-pose_titles_plot  = {'x [mm]', 'y [mm]', 'Roll [mrad]', 'Pitch [mrad]', 'Yaw [mrad]'};
-pose_colors       = {'b', '#A2142F', 'm', '#0072BD', '#7E2F8E'};
-
-for v = 1:numel(views)
-    fig = figure('Name', sprintf('Sled Pose — %s', views(v).tag), 'Position', fig_position);
-
-    for d = 1:5
-        subplot(5, 1, d);
-        hold on;
-        plot(time, pose_signals_plot{d}, 'Color', pose_colors{d}, 'LineWidth', 1.2);
-        if views(v).show_dist
-            xline(t_dist_start, 'b--', 'Label', dist_label, ...
-                  'LineWidth', 1.0, 'LabelOrientation', 'horizontal', ...
-                  'LabelHorizontalAlignment', 'right', ...
-                  'LabelVerticalAlignment', 'top', ...
-                  'HandleVisibility', 'off');
-        end
-        hold off;
-        ylabel(pose_titles_plot{d}); grid on;
-        if ~isempty(views(v).xlim), xlim(views(v).xlim); end
-        if d == 1
-            title(sprintf('Sled Unit Pose — %s', views(v).label));
-        end
-    end
-    xlabel('Time [s]');
-
-    print(fig, fullfile(results_dir, sprintf('sled_pose_%s_%s', views(v).tag, noise_tag)), ...
+    print(fig, fullfile(results_dir, sprintf('sled_pose_%s_%s', grp.tag, noise_tag)), ...
           fig_format, fig_dpi);
 end
 
 
-%% 12 — Figure: Command Current Profiles with Zoom Insets
+
+
+%% 11 — Figure: command current profiles with zoom insets
 %  Layout: two rows × two columns
 %    Row 1 : main plot (all 8 magnets, spanning both columns)
 %    Row 2 : init inset (left) | dist inset (right)
@@ -517,7 +544,7 @@ ax_main_cur = nexttile(tlay_cur, [1 2]);
 hold on;
 plot(time, Is_cmd(:, idx_up), '-',  'LineWidth', 1.2);
 plot(time, Is_cmd(:, idx_lw), '--', 'LineWidth', 1.2);
-xline(t_dist_start, 'k:', 'Label', dist_label, ...
+xline(t_dist_start, 'k--', 'Label', dist_label, ...
       'LineWidth', 1.0, 'LabelOrientation', 'horizontal', ...
       'LabelHorizontalAlignment', 'right', ...
       'LabelVerticalAlignment', 'top', ...
@@ -528,7 +555,7 @@ legend([elMaglabels(idx_up), elMaglabels(idx_lw)], ...
        'Location', 'east', 'NumColumns', 2);
 title('Command Current — All 8 Magnets');
 
-% --- Inset: Init Transient ----------------------------------------------
+% --- Inset: init transient ----------------------------------------------
 ax_init_cur = nexttile(tlay_cur);
 hold on;
 plot(time, Is_cmd(:, idx_up), '-',  'LineWidth', 1.0);
@@ -541,12 +568,12 @@ title('Init Transient', 'FontSize', 9, 'Color', zmtitle_color);
 ylabel('I_{cmd} [A]', 'FontSize', 9);
 xlabel('Time [s]', 'FontSize', 9);
 
-% --- Inset: Disturbance Response ----------------------------------------
+% --- Inset: disturbance response ----------------------------------------
 ax_dist_cur = nexttile(tlay_cur);
 hold on;
 plot(time, Is_cmd(:, idx_up), '-',  'LineWidth', 1.0);
 plot(time, Is_cmd(:, idx_lw), '--', 'LineWidth', 1.0);
-xline(t_dist_start, 'k:', 'LineWidth', 0.5);
+xline(t_dist_start, 'k--', 'LineWidth', 0.5, 'HandleVisibility', 'off');
 hold off;
 xlim([t_dist_win_start, t_dist_win_end]);
 grid on; box on;
@@ -592,11 +619,11 @@ print(fig_current, fullfile(results_dir, sprintf('current_%s', noise_tag)), ...
       fig_format, fig_dpi);
 
 
-%% 13 — Bar Chart: Pose Performance Metrics (Trans. + Rot. in one figure)
-%  Row 1: translational DOFs (x, y) in µm
-%  Row 2: rotational DOFs (Roll, Pitch, Yaw) in µrad
-%  Metrics: Peak Transient + Unforced SS   → init transient phase
-%           Peak Dist + IAE + ITAE + finSS → disturbance rejection phase
+%% 12 — Bar chart: pose performance metrics (trans. + rot. in one figure)
+%  Row 1: translational DOFs (px, py) in µm
+%  Row 2: rotational DOFs (roll, pitch, yaw) in µrad
+%  Metrics: peak transient + unforced SS    → init-transient phase
+%           peak dist + IAE + ITAE + finSS  → disturbance-rejection phase
 fig_pose = figure('Name', 'Pose Performance Metrics', 'Position', [50 50 1700 640]);
 
 trans_data = [pose.peak_transient(idx_trans);
@@ -654,7 +681,7 @@ print(fig_pose, fullfile(results_dir, sprintf('pose_metrics_%s', noise_tag)), ..
       fig_format, fig_dpi);
 
 
-%% 14 — Bar Chart: Air Gap Performance Criteria (8 Magnets)
+%% 13 — Bar chart: air gap performance criteria (8 magnets)
 fig_ag = figure('Name', 'Air Gap Metrics', 'Position', [50 50 1600 700]);
 
 ag_data = {ag_perf.peak_transient,  'Peak Transient [µm]';
@@ -682,7 +709,7 @@ print(fig_ag, fullfile(results_dir, sprintf('airgap_metrics_%s', noise_tag)), ..
       fig_format, fig_dpi);
 
 
-%% 15 — Bar Chart: Current Quality (8 Magnets)
+%% 14 — Bar chart: current quality (8 magnets)
 fig_cur = figure('Name', 'Current Quality', 'Position', [50 50 1600 700]);
 
 cur_data = {cur_perf.i_peak,       'Peak Current [A]';
@@ -706,12 +733,12 @@ print(fig_cur, fullfile(results_dir, sprintf('current_metrics_%s', noise_tag)), 
       fig_format, fig_dpi);
 
 
-%% 17 — Save Results
+%% 15 — Save results
 results.time         = time;
 results.Is_cmd       = Is_cmd;
 results.I_act        = I_act;
 results.meas_ag      = meas_ag;
-results.pose         = [slu_x, slu_y, slu_roll, slu_pitch, slu_yaw];
+results.pose         = [slu_px, slu_py, slu_roll, slu_pitch, slu_yaw];
 results.labels       = elMaglabels;
 results.nom_airgap   = target_ag;
 results.i_eq_vec     = i_eq_vec;
@@ -732,10 +759,10 @@ save(fullfile(results_dir, sprintf('simulation_results_%s.mat', noise_tag)), 're
 
 fprintf('\n=== Results saved to %s/ ===\n', results_dir);
 fprintf('  Time series:\n');
-fprintf('    airgap_%s.png             (main plot + 4 insets)\n', noise_tag);
+fprintf('    airgap_%s.png             (main plot + 2 insets)\n', noise_tag);
 fprintf('    current_%s.png            (main plot + 2 insets)\n', noise_tag);
-for v = 1:numel(views)
-    fprintf('    sled_pose_%s_%s.png\n', views(v).tag, noise_tag);
+for v = 1:numel(pose_groups)
+    fprintf('    sled_pose_%s_%s.png\n', pose_groups(v).tag, noise_tag);
 end
 fprintf('  Metrics:\n');
 fprintf('    pose_metrics_%s.png       (trans top + rot bottom)\n', noise_tag);
@@ -744,7 +771,7 @@ fprintf('    current_metrics_%s.png\n',    noise_tag);
 fprintf('  Data:      simulation_results_%s.mat\n', noise_tag);
 
 
-%% 18 — Cleanup: Remove Simulink Cache Files
+%% 16 — Cleanup: remove Simulink cache files
 if exist('slprj', 'dir'), rmdir('slprj', 's'); end
 slxc = dir(fullfile(pwd, '*.slxc'));
 for k = 1:numel(slxc)

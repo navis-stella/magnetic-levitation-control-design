@@ -210,7 +210,7 @@ Each simulation runs for $T_\text{sim} = 1\,\text{s}$, starting from the **rest 
 
 | Channel | Value | Status |
 |---|---|---|
-| $F_x$ step | $-900\,\text{N}$ at $t = 0.5\,\text{s}$ | applied |
+| $F_x$ step | $-1200\,\text{N}$ at $t = 0.5\,\text{s}$ | applied |
 | $F_y$ step | $+800\,\text{N}$ at $t = 0.5\,\text{s}$ | applied |
 | $T_z$ step | $+1000\,\text{N}\!\cdot\!\text{m}$ | configured but not exercised |
 
@@ -252,7 +252,7 @@ The noise-off rest-to-equilibrium response (figures `sled_pose_init_noise_off.pn
 
 ### 13.6.3 Disturbance Rejection
 
-A constant $F_x = -900\,\text{N}$, $F_y = +800\,\text{N}$ step is applied at the sled tip frame at $t = 0.5\,\text{s}$. Because the tip is offset from the sled's geometric center, the applied forces also generate moments about all three rotational axes, so a single step input exercises every controlled DOF simultaneously.
+A constant $F_x = -1200\,\text{N}$, $F_y = +800\,\text{N}$ step is applied at the sled tip frame at $t = 0.5\,\text{s}$. Because the tip is offset from the sled's geometric center, the applied forces also generate moments about all three rotational axes, so a single step input exercises every controlled DOF simultaneously.
 
 <div align="center">
   <img src="../04_Control_Design_SledUnit_Levitation/Results/sled_pose_dist_noise_on.png" width="720" alt="Disturbance-window pose response, noise on"/>
@@ -266,15 +266,15 @@ The peak excursions following the step are small in absolute terms and consisten
 
 | DOF | Peak deviation (noise on) | Peak deviation (noise off) |
 |---|---|---|
-| $x$ | $-7.5$ µm | $-7.5$ µm |
-| $y$ | $+6.7$ µm | $+6.7$ µm |
+| $x$ | $-10$ µm | $-10$ µm |
+| $y$ | $+6.8$ µm | $+6.8$ µm |
 | Roll | $-0.25$ µrad | $-0.25$ µrad |
-| Pitch | $-0.27$ µrad | $-0.27$ µrad |
-| Yaw | $+0.027$ µrad | $+0.027$ µrad |
+| Pitch | $-0.36$ µrad | $-0.36$ µrad |
+| Yaw | $+0.038$ µrad | $+0.038$ µrad |
 
 </div>
 
-The translational deviations are micrometre-scale despite the kilonewton-scale applied force — for $F_y = 800$ N, the peak $y$ excursion of 6.7 µm corresponds to a transient open-loop compliance of $\approx 8$ nm/N, which is the figure of merit the magnetic-bearing literature would call this design "stiff." The rotational responses are sub-microradian: the moment arms from the tip frame to the geometric center are small enough that the induced torques are modest, and the augmented observer estimates them and the feedforward compensates within the same disturbance-pole time constant.
+The translational deviations are micrometre-scale despite the kilonewton-scale applied force — for $F_y = 800$ N, the peak $y$ excursion of 6.8 µm corresponds to a transient open-loop compliance of $\approx 8.5$ nm/N, which is the figure of merit the magnetic-bearing literature would call this design "stiff." The rotational responses are sub-microradian: the moment arms from the tip frame to the geometric center are small enough that the induced torques are modest, and the augmented observer estimates them and the feedforward compensates within the same disturbance-pole time constant.
 
 After the peak the trajectory is exponentially returning to zero, but the slow tail visible in figure 13.5 is the **augmented observer's disturbance-tracking pole** — sized in S6 of the design script to $\approx 10$ rad/s, giving a $\approx 100$ ms time constant for $\hat{d}$ to fully converge to the true disturbance. The simulation horizon (0.5 s after disturbance onset) is therefore $\approx 5$ time constants — enough to verify that the recovery is monotonic and on track, but not long enough to plot the full asymptote. Section [§13.6.4](#1364-offset-free-behavior-noise-vs-noise-free) shows what happens as the trajectory continues toward the asymptote.
 
@@ -304,7 +304,7 @@ The decisive test of the architecture is the residual error in steady state — 
 | Quantity | Noise on | Noise off |
 |---|---|---|
 | Air-gap final SS-error (all 8 magnets) | $\approx 4.5 \times 10^{-2}$ µm ($\approx 45$ nm) | $\approx 3.7 \times 10^{-7}$ µm ($\approx 0.4$ fm) |
-| Pose final SS-error, $x$ | $\approx 2.7 \times 10^{-2}$ µm | $\approx 2.6 \times 10^{-2}$ µm |
+| Pose final SS-error, $x$ | $\approx 3.6 \times 10^{-2}$ µm | $\approx 3.5 \times 10^{-2}$ µm |
 | Pose final SS-error, $y$ | $\approx 2.4 \times 10^{-2}$ µm | $\approx 2.3 \times 10^{-2}$ µm |
 | Pose final SS-error, rotations | sub-µrad noise floor | sub-µrad numerical floor |
 
@@ -324,7 +324,7 @@ The pose final SS-error row is less clean: at the end of the 1 s simulation hori
   <img src="../04_Control_Design_SledUnit_Levitation/Results/pose_metrics_noise_off.png" width="720" alt="Pose metrics, noise off"/>
 </div>
 
-> **Figure 13.9** — Sled pose performance metrics, noise off. Translational SS-error at $t = 1$ s is at $\approx 25$ nm scale (still slowly converging via the observer disturbance pole); rotational SS-error is sub-µrad.
+> **Figure 13.9** — Sled pose performance metrics, noise off. Translational SS-error at $t = 1$ s is at the tens-of-nanometres scale (still slowly converging via the observer disturbance pole); rotational SS-error is sub-µrad.
 
 The combined picture — air-gap residual at machine precision in noise-off, pose residual converging toward the same floor over a longer horizon — confirms that the closed loop has the property that the design was meant to deliver.
 
@@ -338,7 +338,7 @@ The combined picture — air-gap residual at machine precision in noise-off, pos
 | Initialization current peak | 15 A (briefly saturated) | Within amplifier limit; soft-start advisable in hardware |
 | Initialization air-gap convergence | symmetric at 0.5 mm | Equilibrium currents from S1 are consistent with the multibody plant |
 | DOF decoupling at initialization | Pitch and Yaw at noise floor | Cross-coupling absorbed by LQR + observer |
-| Disturbance peak, translation | $\le 7.5$ µm under $\sim 1.2$ kN net force | Stiff response |
+| Disturbance peak, translation | $\le 10$ µm under $\sim 1.4$ kN net force | Stiff response |
 | Disturbance peak, rotation | sub-µrad | Tip-frame moment arms absorbed cleanly |
 | Per-magnet current excursion (disturbance) | $\le 0.5$ A | Over-actuated allocation routes effort through the relevant magnet subset |
 | **Offset-free residual error (noise off)** | $\approx 0.4$ fm air-gap, machine precision | **Architectural property of the design confirmed** |
