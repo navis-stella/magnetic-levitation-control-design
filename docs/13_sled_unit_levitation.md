@@ -225,10 +225,16 @@ Two complete test runs are reported: **noise-on** (measurement noise as specifie
 The first 100 ms of the simulation contain the entire rest-to-equilibrium transient, well before the disturbance event.
 
 <div align="center">
-  <img src="../04_Control_Design_SledUnit_Levitation/Results/sled_pose_init_noise_on.png" width="720" alt="Initialization transient, noise on"/>
+  <img src="../04_Control_Design_SledUnit_Levitation/Results/sled_pose_translation_noise_on.png" width="720" alt="Sled translational deviation, noise on"/>
 </div>
 
-> **Figure 13.2** — Sled pose during the rest-to-equilibrium transient (noise on).
+> **Figure 13.2** — Sled-unit translational deviation $p_x$, $p_y$ over the full 1 s simulation (noise on). The bottom-left inset zooms into the init transient (0–100 ms); the bottom-right inset zooms into the disturbance window (≈ 0.5–0.6 s).
+
+<div align="center">
+  <img src="../04_Control_Design_SledUnit_Levitation/Results/sled_pose_rotation_noise_on.png" width="720" alt="Sled rotational deviation, noise on"/>
+</div>
+
+> **Figure 13.3** — Sled-unit rotational deviation Roll/Pitch/Yaw over the full 1 s simulation (noise on). Bottom-left and bottom-right insets show the init transient and the disturbance window respectively.
 
 The translational $y$ channel carries the initialization step: starting at $\approx -0.7$ mm, the sled lifts off the supports and the deviation collapses below 0.1 µm within $\approx 50$ ms. The $x$ channel never leaves the nanometre band — there is no $x$-deviation in the rest pose to drive it, so the only excitation is the cross-coupling through the mass-inertia matrix during the $y$ rise, which the controller absorbs immediately. The rotational channels show a small Roll oscillation peaking at $\approx 30$ µrad that damps in $\approx 15$ ms; Pitch and Yaw remain at the numerical noise floor (sub-picoradian peaks), confirming that the LQR + augmented-observer design decouples the controlled axes cleanly even when the initial condition is well outside the strict linearization neighborhood.
 
@@ -236,7 +242,7 @@ The translational $y$ channel carries the initialization step: starting at $\app
   <img src="../04_Control_Design_SledUnit_Levitation/Results/airgap_noise_on.png" width="720" alt="Air-gap profiles, noise on"/>
 </div>
 
-> **Figure 13.3** — Air-gap profiles of the eight magnets with measurement noise active. Upper magnets start at $\approx 1.0$ mm (rest pose); lower magnets start at $\approx 0$ mm. All eight converge to the 0.5 mm setpoint within $\approx 50$ ms.
+> **Figure 13.4** — Air-gap profiles of the eight magnets with measurement noise active. Upper magnets start at $\approx 1.0$ mm (rest pose); lower magnets start at $\approx 0$ mm. All eight converge to the 0.5 mm setpoint within $\approx 50$ ms.
 
 All eight gaps converge to a symmetric configuration at the 0.5 mm setpoint within the same time window. The upper-magnet group (start $\approx 1.0$ mm) and the lower-magnet group (start $\approx 0$ mm) traverse mirror-image trajectories — a small undershoot below the setpoint at $\approx 5$ ms, a milder overshoot at $\approx 10$ ms, and an exponential approach to 0.5 mm thereafter. After $\approx 100$ ms the four upper traces overlap and the four lower traces overlap, confirming that the equilibrium is reached with the symmetric air-gap pattern the controller is designed to deliver, not a CoM-offset-shifted one.
 
@@ -244,21 +250,15 @@ All eight gaps converge to a symmetric configuration at the 0.5 mm setpoint with
   <img src="../04_Control_Design_SledUnit_Levitation/Results/current_noise_on.png" width="720" alt="Command currents, noise on"/>
 </div>
 
-> **Figure 13.4** — Command currents for all 8 magnets (noise on). The initialization-transient inset (bottom-left) and the disturbance-window inset (bottom-right) zoom into the two events. Solid traces: upper magnets (ELO, ERO, SLO, SRO). Dashed traces: lower magnets (ELU, ERU, SLU, SRU).
+> **Figure 13.5** — Command currents for all 8 magnets (noise on). The initialization-transient inset (bottom-left) and the disturbance-window inset (bottom-right) zoom into the two events. Solid traces: upper magnets (ELO, ERO, SLO, SRO). Dashed traces: lower magnets (ELU, ERU, SLU, SRU).
 
 The current view explains where the dynamics are spent. During the first $\approx 2$ ms several currents **briefly saturate at the 15 A amplifier limit** — this is the price the user-supplied rest pose pays for not running through a soft-start, and it is what the soft-start note in [§13.1](#131-system-description) is designed to address in hardware. The currents drop back below the limit within $\approx 5$ ms, oscillate at the closed-loop natural frequency for another $\approx 20$ ms, and settle to their levitation values within $\approx 50$ ms: upper magnets at $\approx 10.2$ A, lower magnets at $\approx 9.7$ A. The asymmetry between the two groups is exactly the CoM-offset-absorbing allocation that the `fmincon` step (S1) computes, and the cleanly converged plateau confirms that the operating-point currents agree between the design script and the closed-loop simulation.
 
-The noise-off rest-to-equilibrium response (figures `sled_pose_init_noise_off.png`, `airgap_noise_off.png`, `current_noise_off.png` in the Results folder) is visually indistinguishable on this timescale from the noise-on response: the initialization transient is fully controller-driven and noise has no effect at the time-scale and the deflection magnitudes involved.
+The noise-off rest-to-equilibrium response (figures `sled_pose_translation_noise_off.png`, `sled_pose_rotation_noise_off.png`, `airgap_noise_off.png`, `current_noise_off.png` in the Results folder) is visually indistinguishable on this timescale from the noise-on response: the initialization transient is fully controller-driven and noise has no effect at the time-scale and the deflection magnitudes involved.
 
 ### 13.6.3 Disturbance Rejection
 
-A constant $F_x = -1200\,\text{N}$, $F_y = +800\,\text{N}$ step is applied at the sled tip frame at $t = 0.5\,\text{s}$. Because the tip is offset from the sled's geometric center, the applied forces also generate moments about all three rotational axes, so a single step input exercises every controlled DOF simultaneously.
-
-<div align="center">
-  <img src="../04_Control_Design_SledUnit_Levitation/Results/sled_pose_dist_noise_on.png" width="720" alt="Disturbance-window pose response, noise on"/>
-</div>
-
-> **Figure 13.5** — Sled pose around the disturbance event (noise on). The blue dashed line marks the disturbance onset at $t = 0.5\,\text{s}$.
+A constant $F_x = -1200\,\text{N}$, $F_y = +800\,\text{N}$ step is applied at the sled tip frame at $t = 0.5\,\text{s}$. Because the tip is offset from the sled's geometric center, the applied forces also generate moments about all three rotational axes, so a single step input exercises every controlled DOF simultaneously. The response is shown in the disturbance-window insets (bottom-right panels) of Figures 13.2 and 13.3.
 
 The peak excursions following the step are small in absolute terms and consistent in structure across the noise scenarios:
 
@@ -276,13 +276,13 @@ The peak excursions following the step are small in absolute terms and consisten
 
 The translational deviations are micrometre-scale despite the kilonewton-scale applied force — for $F_y = 800$ N, the peak $y$ excursion of 6.8 µm corresponds to a transient open-loop compliance of $\approx 8.5$ nm/N, which is the figure of merit the magnetic-bearing literature would call this design "stiff." The rotational responses are sub-microradian: the moment arms from the tip frame to the geometric center are small enough that the induced torques are modest, and the augmented observer estimates them and the feedforward compensates within the same disturbance-pole time constant.
 
-After the peak the trajectory is exponentially returning to zero, but the slow tail visible in figure 13.5 is the **augmented observer's disturbance-tracking pole** — sized in S6 of the design script to $\approx 10$ rad/s, giving a $\approx 100$ ms time constant for $\hat{d}$ to fully converge to the true disturbance. The simulation horizon (0.5 s after disturbance onset) is therefore $\approx 5$ time constants — enough to verify that the recovery is monotonic and on track, but not long enough to plot the full asymptote. Section [§13.6.4](#1364-offset-free-behavior-noise-vs-noise-free) shows what happens as the trajectory continues toward the asymptote.
+After the peak the trajectory is exponentially returning to zero, but the slow tail visible in the disturbance-window insets of Figures 13.2 and 13.3 is the **augmented observer's disturbance-tracking pole** — sized in S6 of the design script to $\approx 10$ rad/s, giving a $\approx 100$ ms time constant for $\hat{d}$ to fully converge to the true disturbance. The simulation horizon (0.5 s after disturbance onset) is therefore $\approx 5$ time constants — enough to verify that the recovery is monotonic and on track, but not long enough to plot the full asymptote. Section [§13.6.4](#1364-offset-free-behavior-noise-vs-noise-free) shows what happens as the trajectory continues toward the asymptote.
 
 <div align="center">
   <img src="../04_Control_Design_SledUnit_Levitation/Results/current_noise_on.png" width="720" alt="Currents around disturbance, noise on" />
 </div>
 
-> **Figure 13.6** — Disturbance-window current inset (bottom-right panel of Figure 13.4). Per-magnet excursions are below 0.5 A across the 80 ms window shown.
+> **Figure 13.6** — Disturbance-window current inset (bottom-right panel of Figure 13.5). Per-magnet excursions are below 0.5 A across the 80 ms window shown.
 
 The disturbance-window current inset shows the over-actuated allocation responding cleanly. No magnet excurses more than $\approx 0.5$ A from its operating point, and the redistribution is anti-symmetric in a way that reflects which magnets contribute force in each disturbed direction. The Total-Variation bar chart of Figure 13.7 makes this anti-symmetry explicit: four of the eight magnets (ELU, ERO, SLU, SRO) carry $\approx 0.5$ A of total-variation activity within the 200 ms post-disturbance window, while the other four (ELO, ERU, SLO, SRU) carry $\approx 0.03$ A. The four active magnets are precisely the magnet-pole pairs whose force components have non-zero projection on the applied $F_x, F_y$ direction; the inactive four are the orthogonal pair set. This is the over-actuated `pinv(Ki)` allocation in action — it routes the corrective effort through the minimum-norm subset of magnets that can cancel the disturbance.
 
