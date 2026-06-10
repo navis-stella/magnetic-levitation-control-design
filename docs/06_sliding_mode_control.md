@@ -69,14 +69,14 @@ guaranteeing finite-time reaching of the boundary layer.
 
 ## 6.6 Implementation Variants
 - **`Maglev_SMC_block_test.slx`** — uses the built-in Sliding Mode Controller block from Simulink Control Design, with the ideal Simscape velocity. Reference baseline for cross-checking.
-- **`Maglev_SMC_mfcn.slx`** — user-defined MATLAB Function implementing the full control law of [§6.8](#68-smc-with-integral-action-augmented-sliding-surface) (integral-action variant), running on the EKF-estimated state. This is the version exercised in the [§9](09_evaluation_framework.md) evaluation.
+- **`Maglev_ISMC.slx`** — user-defined MATLAB Function implementing the full control law of [§6.8](#68-smc-with-integral-action-augmented-sliding-surface) (integral-action variant), running on the EKF-estimated state. This is the version exercised in the [§9](09_evaluation_framework.md) evaluation.
 
 ## 6.7 Behavior Under EKF-Estimated Velocity
 The SMC design above was validated against the ideal Simscape velocity. When the velocity is replaced by the EKF estimate $\hat{x}\_2$ (as on hardware), the equivalent control $u_{eq}$ no longer exactly cancels gravity, because the small phase lag and bias of $\hat{x}_2$ enter the controller as an effective matched disturbance. The reaching law's switching term absorbs this disturbance into the boundary layer, but the trajectory settles at $|s| \leq \phi$ rather than at $s = 0$ — and on the standard surface $s = \lambda x_1 + x_2$, a non-zero $s$ implies a non-zero $x_1$ at steady state.
 
 In practice this residual offset is very small, thanks to SMC's intrinsic robustness. But it is non-zero, which is inconsistent with the zero-steady-state-error behavior of every other controller in this project. To restore that property, an integral-action variant is implemented in [§6.8](#68-smc-with-integral-action-augmented-sliding-surface).
 
-## 6.8 SMC with Integral Action (Augmented Sliding Surface)
+## 6.8 SMC with Integral Action (ISMC, Augmented Sliding Surface)
 The standard surface of [§6.1](#61-sliding-surface) is extended with an integral term, keeping $\lambda$ in its original role and adding a single integral gain $k_i$:
 
 $$

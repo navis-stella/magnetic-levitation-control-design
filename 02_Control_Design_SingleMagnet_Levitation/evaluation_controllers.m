@@ -47,7 +47,7 @@ models = {
     struct('folder', LIN, 'model', 'Maglev_SSC',             'label', 'SSC',          'params', 'LinearControllerData');
     struct('folder', NLC, 'model', 'Maglev_Backstepping',    'label', 'Backstepping', 'params', 'NonlinearControllerData');
     struct('folder', NLC, 'model', 'Maglev_FeedbackLin',     'label', 'FeedbackLin',  'params', 'NonlinearControllerData');
-    struct('folder', NLC, 'model', 'Maglev_SMC_mfcn',        'label', 'SMC',          'params', 'NonlinearControllerData');
+    struct('folder', NLC, 'model', 'Maglev_ISMC',            'label', 'SMC',          'params', 'NonlinearControllerData');
     struct('folder', MPC, 'model', 'Maglev_NMPC_OffsetFree', 'label', 'NMPC',         'params', 'OffsetFreeNMPCData');
 };
 % --- Signal Names ---
