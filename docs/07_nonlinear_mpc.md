@@ -87,7 +87,8 @@ The process- and measurement-noise covariances follow the [§8](08_ekf.md) philo
 
 **Observability.** A rank check on the augmented pair $(\tilde{A}, \tilde{H})$ at the operating point confirms that the position measurement is sufficient to recover all three augmented states. This is the standard offset-free MPC observability requirement: the disturbance must be observable through the same measurement that drives the original state estimate.
 
-This observer is used only inside the offset-free NMPC. The unaugmented EKF of [§8](08_ekf.md) remains the right observer for the five closed-form controllers, which carry their own integral states; the augmented EKF is the right observer for the offset-free NMPC, which carries none.
+In the current architecture, this observer is used only inside the offset-free NMPC: the unaugmented EKF of [§8](08_ekf.md) serves the five closed-form controllers, which carry their own integral states, while the augmented EKF serves the offset-free NMPC, which carries none. Both pairings realize the internal model principle and are equivalent in their steady-state offset-free property — they differ only in where the disturbance model is embedded (controller vs. observer). A unified architecture, in which the advanced closed-form controllers share the augmented EKF and their integral states are removed (with PID retained in classical form as the SISO reference), is a natural simplification and is noted in the [Status and Future Work](../README.md#status-and-future-work) section.
+
 
 ### 7.5.3 Target Steady-State Calculation
 
