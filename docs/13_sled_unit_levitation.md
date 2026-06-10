@@ -1,6 +1,6 @@
 # 13. Sled-Unit Levitation
 
-This is the most complex system in the project: a multi-DOF magnetically levitated sled unit. It serves two purposes simultaneously — to deliver a working controller for an industrially-realistic geometry, and to validate the design recommendation of [§11.3](11_comparative_analysis.md) (state-space control as the practical default for multi-DOF magnetic bearing systems) on a system whose scale would make any of the nonlinear analytical methods prohibitive.
+This is the most complex system in the project: a multi-DOF magnetically levitated sled unit. It serves two purposes simultaneously — to deliver a working controller for an industrially-realistic geometry, and to validate the design recommendation of [§11.3](11_comparative_analysis.md#113-the-multi-dof-question--the-structural-argument-for-ssc) (state-space control as the practical default for multi-DOF magnetic bearing systems) on a system whose scale would make any of the nonlinear analytical methods prohibitive.
 
 The chapter is organized around four threads: the mechanical configuration ([§13.1](#131-system-description)), the CAD-based multibody modeling workflow ([§13.2](#132-cad-based-multibody-modeling)–[§13.3](#133-frame-and-force-conventions)), the parameter-organization architecture that keeps the model maintainable at this scale ([§13.4](#134-parameter-organization-setup_machine_model)), and the controller and observer design ([§13.5](#135-state-space-controller-and-observer-controller_design)).
 
@@ -57,7 +57,7 @@ Each CAD body is wrapped in a Simulink subsystem with a graphical mask. The mask
 
 ## 13.3 Frame and Force Conventions
 
-The multibody modeling conventions validated on the dual-magnet system ([§12.3](12_dual_magnet_levitation.md)) are applied identically here, just at higher scale:
+The multibody modeling conventions validated on the dual-magnet system ([§12.3](12_dual_magnet_levitation.md#123-frame-convention)) are applied identically here, just at higher scale:
 
 - The z-axis of every magnet surface frame points outward from the magnet; the z-axis of every armature surface frame points inward into the armature.
 - Reluctance Force Actuators connect magnet–armature pairs with consistent R/C port assignments.
@@ -80,7 +80,7 @@ The configuration chain executes in a defined order, entered through `setup_stru
 
 1. **`init_system_const.m`** — defines system-wide physical constants and constraints that are independent of the mechanical design: amplifier current limits, gravity vector, measurement-noise specifications. Loaded first so that all downstream scripts have a consistent reference.
 2. **`setup_sled_dyn_params.m`** — defines the sled's kinematic and dynamic parameters:
-   - *Kinematic:* the position vector of each magnet relative to the sled's geometric center, magnet dimensions, and surface normal vectors (which fix the force direction of each magnet–rail pair via the [§12.3](12_dual_magnet_levitation.md) convention).
+   - *Kinematic:* the position vector of each magnet relative to the sled's geometric center, magnet dimensions, and surface normal vectors (which fix the force direction of each magnet–rail pair via the [§12.3](12_dual_magnet_levitation.md#123-frame-convention) convention).
    - *Dynamic:* the sled mass, the inertia tensor about the center of mass, the inertia tensor about the geometric center (used by the multibody solver), and the offset vector from the geometric center to the center of mass.
 3. **`setup_structure_params.m`** (the entry point) — defines the stationary structure: the machine stand and magnet rails, their geometric centers, and the rigid transformations (translation + rotation) that locate each rail in the world frame. It calls `init_system_const.m` and `setup_sled_dyn_params.m`, then concludes by calling step 4.
 4. **`calculate_airgap_equilibrium_and_rest.m`** — closes the loop by computing the two reference poses defined in [§13.1](#131-system-description):
@@ -93,7 +93,7 @@ Top-level simulation conditions — simulation time, external disturbance schedu
 
 ## 13.5 State-Space Controller and Observer (`Controller_Design/`)
 
-The controller is a linear-quadratic regulator (LQR) on the linearized 10-state plant, paired with a 15-state **augmented Kalman observer** that jointly estimates the plant state and a five-dimensional generalized disturbance $\hat{d}$ — the equivalent residual force/moment acting on the sled that the linear model alone cannot explain. The disturbance estimate is cancelled at the input through a static feedforward gain, so the closed loop is offset-free without any integral state in the controller. The augmented-observer pattern is taken directly from the offset-free NMPC of [§7.5](07_nonlinear_mpc.md) — augment the model with a random-walk disturbance state on the velocity channel, estimate it jointly with the plant state, and use it to correct the input target — but realized here in a fully linear setting, because the LQR operates on a linearization of the plant.
+The controller is a linear-quadratic regulator (LQR) on the linearized 10-state plant, paired with a 15-state **augmented Kalman observer** that jointly estimates the plant state and a five-dimensional generalized disturbance $\hat{d}$ — the equivalent residual force/moment acting on the sled that the linear model alone cannot explain. The disturbance estimate is cancelled at the input through a static feedforward gain, so the closed loop is offset-free without any integral state in the controller. The augmented-observer pattern is taken directly from the offset-free NMPC of [§7.5](07_nonlinear_mpc.md#75-offset-free-nmpc) — augment the model with a random-walk disturbance state on the velocity channel, estimate it jointly with the plant state, and use it to correct the input target — but realized here in a fully linear setting, because the LQR operates on a linearization of the plant.
 
 Two design issues are specific to this scale and warrant explicit discussion before the pipeline:
 
@@ -196,7 +196,7 @@ These checks catch design errors at script time rather than at simulation time, 
 - `ssc_params` — dimensions ($\dim_s = 5$, $\dim_x = 10$, $\dim_d = 5$, $\dim_\text{aug} = 15$, $\dim_u = 8$), nominal air gap, equilibrium current vector and named struct, LQR gain $K_\text{lqr}$ (8×10), feedforward gain $K_{d,\text{ff}}$ (8×5), and the combined controller gain $K_\text{total}$ (8×15) consumed by the Simulink controller block.
 - `obs_params` — augmented system matrices $A_\text{aug}$, $B_\text{aug}$, $C_\text{aug}$ and the Kalman gain $L_\text{aug}$.
 
-A companion `Simulink.Bus` object `obs_Bus` is also saved (`obs_params_Bus.mat`) so the observer subsystem in the Simulink model receives its entire configuration through a single bus port — the same parameter-bundling pattern as the EKF subsystem in [§8.4](08_ekf.md).
+A companion `Simulink.Bus` object `obs_Bus` is also saved (`obs_params_Bus.mat`) so the observer subsystem in the Simulink model receives its entire configuration through a single bus port — the same parameter-bundling pattern as the EKF subsystem in [§8.4](08_ekf.md#84-implementation-in-simulink).
 
 ## 13.6 Evaluation and Results
 
@@ -348,11 +348,11 @@ The combined picture — air-gap residual at machine precision in noise-off, pos
 
 ### 13.6.6 What This Demonstrates About the Recommendation
 
-The empirical results validate the design recommendation made in [§11.3](11_comparative_analysis.md):
+The empirical results validate the design recommendation made in [§11.3](11_comparative_analysis.md#113-the-multi-dof-question--the-structural-argument-for-ssc):
 
 - **The linear state-space framework scales without structural change to 5 DOF / 8 actuators.** The same workflow used at 1-DOF in [§3](03_state_space_control.md) — linearize, weight, solve — applied directly at this scale; only the matrices grew, the design moves did not.
-- **The augmented-observer pattern from [§7.5](07_nonlinear_mpc.md) is reusable in a linear setting.** The offset-free behavior that NMPC achieves through an augmented EKF + online target calculation is reproduced here with a linear Kalman filter and a static pseudoinverse feedforward — far simpler computationally, identical in the steady-state property delivered.
+- **The augmented-observer pattern from [§7.5](07_nonlinear_mpc.md#75-offset-free-nmpc) is reusable in a linear setting.** The offset-free behavior that NMPC achieves through an augmented EKF + online target calculation is reproduced here with a linear Kalman filter and a static pseudoinverse feedforward — far simpler computationally, identical in the steady-state property delivered.
 - **The redundant actuation (8 magnets, 5 DOFs) is exploited automatically.** The `fmincon` allocation at design time spreads the equilibrium load asymmetrically to absorb the CoM offset; the `pinv(Ki)` feedforward at runtime selects the minimum-norm current correction for any estimated disturbance. Neither step requires per-disturbance redesign.
 - **The design-time verification suite (S7) accurately predicted the closed-loop behavior.** The stability margin, the offset-free sensitivity DC gain, and the step disturbance simulation all matched the realised closed-loop response to within the expected tolerances. Building verification into the design script meant no surprises at simulation time.
 
-These observations are the concrete sled-unit-level evidence behind the recommendation that state-space control is the practical default for multi-DOF magnetic bearing systems: extending the same workflow used at 1-DOF to a 15-state, 8-input system with a 25-state closed loop was structurally trivial, and the closed-loop result is excellent on every measured criterion. The augmented-observer route to offset-free behavior, introduced in this chapter, generalizes the [§11.3](11_comparative_analysis.md) argument: linear state-space control with an augmented Kalman observer is the practical default whenever offset-free behavior is required at multi-DOF scale, with offset-free NMPC reserved for the cases where constraint handling enters as a hard design requirement.
+These observations are the concrete sled-unit-level evidence behind the recommendation that state-space control is the practical default for multi-DOF magnetic bearing systems: extending the same workflow used at 1-DOF to a 15-state, 8-input system with a 25-state closed loop was structurally trivial, and the closed-loop result is excellent on every measured criterion. The augmented-observer route to offset-free behavior, introduced in this chapter, generalizes the [§11.3](11_comparative_analysis.md#113-the-multi-dof-question--the-structural-argument-for-ssc) argument: linear state-space control with an augmented Kalman observer is the practical default whenever offset-free behavior is required at multi-DOF scale, with offset-free NMPC reserved for the cases where constraint handling enters as a hard design requirement.

@@ -82,4 +82,4 @@ The evaluation script plots in **absolute air-gap coordinates** — the y-axis r
 
 ## 9.7 Note on the Sled-Unit Evaluation
 
-A parallel script `evaluation_sled_levitation.m` in folder 04 plays the same role for the 5-DOF sled-unit system — executes `SledUnit_Levitation_Control.slx` programmatically, collects air-gap responses, current commands, and sled-pose trajectories, plots them, and writes the figures and raw `simulation_results.mat` to `04_*/Results/`. See [§13.6](13_sled_unit_levitation.md) for details.
+A parallel script `evaluation_sled_levitation.m` in folder 04 plays the same role for the 5-DOF sled-unit system — executes `SledUnit_Levitation_Control.slx` programmatically, collects air-gap responses, current commands, and sled-pose trajectories, plots them, and writes the figures and raw `simulation_results.mat` to `04_*/Results/`. See [§13.6](13_sled_unit_levitation.md#136-evaluation-and-results) for details.

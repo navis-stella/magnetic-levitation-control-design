@@ -29,7 +29,7 @@ $$
 i_s = (x_0 - x_1)\sqrt{\dfrac{m}{K_m}  \bigl[  g - (1 + c_1 c_2)  x_1 - (c_1 + c_2)  x_2  \bigr]}
 $$
 
-**Why this isn't enough.** This design stabilizes the nominal plant asymptotically but contains no integral term. Modelling errors and constant disturbances produce a non-zero steady-state offset — exactly the failure mode of the PD design in [§2.1](02_pid.md). The remedy is to extend the procedure with an integral state.
+**Why this isn't enough.** This design stabilizes the nominal plant asymptotically but contains no integral term. Modelling errors and constant disturbances produce a non-zero steady-state offset — exactly the failure mode of the PD design in [§2.1](02_pid.md#21-pd-via-second-order-pole-placement). The remedy is to extend the procedure with an integral state.
 
 ## 4.2 Backstepping with Augmented Integral State
 Introduce the integral of position: $\dot{\sigma} = x_1$. The augmented system $(\sigma, x_1, x_2)$ is treated in three stages.

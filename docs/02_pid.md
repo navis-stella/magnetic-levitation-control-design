@@ -9,7 +9,7 @@ $$
 i = K_p\bullet x + K_d\bullet \dot{x}
 $$
 
-substituted into the linearized plant of [§1.4](01_system_modeling.md) yields
+substituted into the linearized plant of [§1.4](01_system_modeling.md#14-linearization) yields
 
 $$
 m\ddot{x} - k_i K_d \dot{x} - (k_x + k_i K_p) x = 0

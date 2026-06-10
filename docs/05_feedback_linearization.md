@@ -1,6 +1,6 @@
 # 5. Feedback Linearization with Outer State-Space Controller
 
-The linearization in [§1.4](01_system_modeling.md) is only valid in a small neighborhood of $(x_0, i_0)$. The true stiffness coefficients $k_x(x), k_i(x, i)$ vary strongly with the air gap, so a linear controller designed at $x_0 = 2  \text{mm}$ degrades quickly when the system is excited far from equilibrium. **Feedback linearization cancels the nonlinearity exactly** through an input transformation, yielding a closed-loop system that is linear by construction over the entire admissible operating region.
+The linearization in [§1.4](01_system_modeling.md#14-linearization) is only valid in a small neighborhood of $(x_0, i_0)$. The true stiffness coefficients $k_x(x), k_i(x, i)$ vary strongly with the air gap, so a linear controller designed at $x_0 = 2  \text{mm}$ degrades quickly when the system is excited far from equilibrium. **Feedback linearization cancels the nonlinearity exactly** through an input transformation, yielding a closed-loop system that is linear by construction over the entire admissible operating region.
 
 ## 5.1 Affine-in-Control Reformulation
 The nonlinear dynamics

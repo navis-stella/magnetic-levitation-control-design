@@ -29,7 +29,7 @@ The dynamics is one-dimensional, but the modeling apparatus introduced here scal
 
 ## 12.2 Why Multibody Instead of Hand-Derived Equations
 
-For the single-magnet plant in [§1.1](01_system_modeling.md), writing $m\ddot{x} = K_M  i_s^2/x_s^2 - mg$ by hand was straightforward. As soon as the system gains additional bodies, joints, or degrees of freedom, hand-derivation becomes error-prone: every body needs a kinematic transformation, every force needs projection to the center of mass, every constraint needs explicit handling.
+For the single-magnet plant in [§1.1](01_system_modeling.md#11-reluctance-force), writing $m\ddot{x} = K_M  i_s^2/x_s^2 - mg$ by hand was straightforward. As soon as the system gains additional bodies, joints, or degrees of freedom, hand-derivation becomes error-prone: every body needs a kinematic transformation, every force needs projection to the center of mass, every constraint needs explicit handling.
 
 Simscape Multibody removes that burden. The user defines bodies with geometry, mass, and frames; connects them with joints; and applies forces at their natural points of action. The solver computes the equivalent dynamics automatically. This chapter exists to **build confidence in that workflow on a problem simple enough to verify analytically**, before applying the same workflow to a system whose closed-form equations would be impractical.
 
@@ -99,7 +99,7 @@ $$
 k_x = 2 K_m\left(\frac{i_{\text{up},0}^2}{x_{\text{up},0}^3} + \frac{i_{\text{lw},0}^2}{x_{\text{lw},0}^3}\right),\qquad k_i = 2 K_m\left(\frac{i_{\text{up},0}}{x_{\text{up},0}^2} + \frac{i_{\text{lw},0}}{x_{\text{lw},0}^2}\right)
 $$
 
-Both coefficients are strictly positive — each magnet pair contributes additively, so the open-loop plant remains unstable, exactly as in [§1.4](01_system_modeling.md). **Sanity check**: setting $i_{\text{lw},0} = 0$ reduces these expressions to $k_x = 2mg/x_{\text{up},0}$ and $k_i = 2mg/i_{\text{up},0}$, recovering the single-magnet linearization identically.
+Both coefficients are strictly positive — each magnet pair contributes additively, so the open-loop plant remains unstable, exactly as in [§1.4](01_system_modeling.md#14-linearization). **Sanity check**: setting $i_{\text{lw},0} = 0$ reduces these expressions to $k_x = 2mg/x_{\text{up},0}$ and $k_i = 2mg/i_{\text{up},0}$, recovering the single-magnet linearization identically.
 
 **Step 3 — Augmented state-space controller.** Following [§3](03_state_space_control.md), the integral of position is added as a state:
 

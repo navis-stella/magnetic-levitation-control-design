@@ -2,7 +2,7 @@
 
 Feedback linearization ([§5](05_feedback_linearization.md)) cancels the nonlinearity exactly but assumes precise knowledge of $K_m$ and $m$. Parameter mismatch and unmodelled disturbances leak directly into the closed loop as a residual perturbation. **Sliding mode control** is designed to be insensitive to such *matched* uncertainty: a high-gain switching law forces the trajectory onto a designer-chosen invariant manifold, after which the closed-loop dynamics follows a reduced-order reference behavior regardless of disturbances within the design bound.
 
-The same control-affine reformulation $u = i_s^2$ from [§5.1](05_feedback_linearization.md) is reused.
+The same control-affine reformulation $u = i_s^2$ from [§5.1](05_feedback_linearization.md#51-affine-in-control-reformulation) is reused.
 
 ## 6.1 Sliding Surface
 Choose the sliding variable as a linear combination of position and velocity error:

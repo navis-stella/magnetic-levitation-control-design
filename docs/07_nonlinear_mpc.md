@@ -2,7 +2,7 @@
 
 The controllers in [§2](02_pid.md)–[§6](06_sliding_mode_control.md) share a common design philosophy: derive a closed-form control law (via linearization, exact cancellation, Lyapunov recursion, or sliding-mode reasoning) and tune its parameters offline. **Nonlinear Model Predictive Control (NMPC)** is a structurally different approach: at every sampling instant, solve a small constrained optimal-control problem over a finite prediction horizon, apply only the first input, and re-solve at the next instant. Constraints and trajectory shaping enter the design directly through the optimization rather than being retrofitted via saturation or anti-windup.
 
-This chapter documents two NMPC variants. The **standard NMPC** of [§7.2](07_nonlinear_mpc.md)–[§7.4](07_nonlinear_mpc.md) stabilizes the ideal model asymptotically with zero residual error, but exhibits a steady-state offset against the realistic Simscape plant and cannot reject external disturbances — exactly the failure mode the closed-form controllers absorb with an integral state. The **offset-free NMPC** of [§7.5](07_nonlinear_mpc.md) closes this gap by augmenting the prediction model with a disturbance state, estimating it with an augmented EKF, and recomputing the OCP tracking target online from the current disturbance estimate. All three NMPC models (AcadosSim, Simscape, OffsetFree) can be run separately to view and compare their behavior; only the offset-free NMPC enters the [§10](10_results.md) comparison, alongside the five closed-form controllers..
+This chapter documents two NMPC variants. The **standard NMPC** of [§7.2](07_nonlinear_mpc.md#72-standard-nmpc-formulation)–[§7.4](07_nonlinear_mpc.md#74-standard-nmpc-acadossim-vs-simscape--the-diagnostic-gap) stabilizes the ideal model asymptotically with zero residual error, but exhibits a steady-state offset against the realistic Simscape plant and cannot reject external disturbances — exactly the failure mode the closed-form controllers absorb with an integral state. The **offset-free NMPC** of [§7.5](07_nonlinear_mpc.md#75-offset-free-nmpc) closes this gap by augmenting the prediction model with a disturbance state, estimating it with an augmented EKF, and recomputing the OCP tracking target online from the current disturbance estimate. All three NMPC models (AcadosSim, Simscape, OffsetFree) can be run separately to view and compare their behavior; only the offset-free NMPC enters the [§10](10_results.md) comparison, alongside the five closed-form controllers..
 
 ## 7.1 Why NMPC for the Maglev System
 
@@ -114,7 +114,7 @@ The reference $z_\text{ref}$ defaults to zero — track the linearization equili
 
 ### 7.5.4 Modified OCP
 
-The offset-free OCP is the standard NMPC of [§7.2](07_nonlinear_mpc.md) with the zero-reference replaced by the recomputed target $(x_s, u_s)$:
+The offset-free OCP is the standard NMPC of [§7.2](07_nonlinear_mpc.md#72-standard-nmpc-formulation) with the zero-reference replaced by the recomputed target $(x_s, u_s)$:
 
 $$
 \min_{u_0, \ldots, u_{N-1}} \sum_{k=0}^{N-1}\left[(\mathbf{x}_k - x_s)^\top Q (\mathbf{x}_k - x_s) + (u_k - u_s)^\top R (u_k - u_s)\right] + (\mathbf{x}_N - x_s)^\top Q_N (\mathbf{x}_N - x_s)
@@ -136,4 +136,4 @@ All three components run at the same sample rate, and their parameter buses are 
 
 ## 7.7 Dependency: acados
 
-As in [§7.3](07_nonlinear_mpc.md), both NMPC models link against acados shared libraries at runtime and require the acados MATLAB/Simulink interface to be installed. The compiled S-functions are platform- and version-specific and are **not committed** to the repository; running the corresponding design script regenerates them locally. Installation instructions are at [the acados documentation](https://docs.acados.org/installation/).
+As in [§7.3](07_nonlinear_mpc.md#73-implementation-via-acados), both NMPC models link against acados shared libraries at runtime and require the acados MATLAB/Simulink interface to be installed. The compiled S-functions are platform- and version-specific and are **not committed** to the repository; running the corresponding design script regenerates them locally. Installation instructions are at [the acados documentation](https://docs.acados.org/installation/).
